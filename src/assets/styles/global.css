@@ -14,27 +14,50 @@
     /* Fuentes */
     --fuente-principal: 'Lato', sans-serif;
     --fuente-secundaria: 'Pacifico', cursive;
-
 }
 
 /* =================================
-   2. ESTILOS GLOBALES (BODY, HTML)
+   2. LAYOUT BASE Y STICKY FOOTER
    ================================= */
 
-/* * ELIMINADO: El reset universal (*).
- * Razón: Bootstrap ya incluye su propio reset (Reboot.css).
- */
+/* Forzamos a la "cadena" (html, body, root) a ocupar el 100% de la altura */
+html,
+body,
+#root { /* #root es el <div> donde se monta tu App de React */
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
+/* Estilos de fuente y color base del body */
 body {
     font-family: var(--fuente-principal);
     color: var(--color-letra-cafe);
     background-color: var(--color-fondo-crema);
-    
-    /* * ELIMINADO: padding-top: 120px;
-     * Razón: Este es un conflicto crítico. El espaciado
-     * para el header fijo se manejará en el layout de React.
-     */
 }
+
+/* Contenedor Flex del Layout (de PublicLayout.tsx) */
+.public-layout-container {
+  display: flex;
+  flex-direction: column; /* Apila Header, main, Footer */
+  min-height: 100%;    /* Ocupa el 100% de su padre (#root) */
+}
+
+/* Wrapper principal del contenido (se estira) */
+.main-content-wrapper {
+  flex-grow: 1; /* ¡LA CLAVE! Le dice al main que "crezca" y ocupe el espacio */
+  padding-top: 157px; /* (Ajusta este valor si es necesario) */
+}
+
+@media (max-width: 991.98px) {
+  .main-content-wrapper {
+    padding-top: 80px; /* (Ajusta este valor si es necesario) */
+  }
+}
+
+/* =================================
+   3. ESTILOS GLOBALES DE TAGS
+   ================================= */
 
 /* Asegura que los elementos de formulario hereden la fuente */
 input,
@@ -52,27 +75,7 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* * ELIMINADO: Reglas globales de 'img' y 'input'.
- * Razón: Demasiado amplias. Dejamos que Bootstrap
- * y nuestras clases específicas manejen esto.
- */
-
-/* =================================
-   3. CLASES DE UTILIDAD (HELPERS)
-   ================================= */
-
-/* * ELIMINADO: .container
- * Razón: Conflicto crítico. Usaremos el <Container>
- * de react-bootstrap, que depende del CSS original.
- */
-
-.background-pink {
-    background-color: var(--color-fondo-crema);
-}
-
-/* * CORREGIDO: Sintaxis de Media Query.
- * Movido fuera de la anidación.
- */
+/* Estilos base para todas las secciones */
 section {
     padding: 100px 0;
 }
@@ -82,6 +85,14 @@ section {
         /* Añadidos 'px' a las unidades */
         padding: 50px 15px;
     }
+}
+
+/* =================================
+   4. CLASES DE UTILIDAD (HELPERS)
+   ================================= */
+
+.background-pink {
+    background-color: var(--color-fondo-crema);
 }
 
 /* Clases de utilidad para fuentes */
@@ -103,11 +114,8 @@ section {
     font-style: normal;
 }
 
-/* ... (puedes añadir el resto de tus .lato- ... aquí) ... */
-
-
 /* =================================
-   4. COMPONENTES PERSONALIZADOS
+   5. COMPONENTES PERSONALIZADOS
    ================================= */
 
 /* Estilos para un logo personalizado */
@@ -117,9 +125,6 @@ section {
     gap: 20px;
 }
 
-/* * CORREGIDO: Sintaxis de CSS.
- * Movido de anidado a una regla separada.
- */
 .container-logo img {
     width: 50px;
     height: 50px;
@@ -129,11 +134,6 @@ section {
 }
 
 /* Botones personalizados */
-/* * Nota: Dado que usas react-bootstrap, una mejor
- * práctica es usar las "variantes" de <Button variant="primary">.
- * Pero si necesitas sobrescribir, hazlo con clases.
- */
-
 .btn-agregar-carrito {
     background-color: #FFC0CB;
     /* ... (resto de tus estilos de botón) ... */
@@ -161,53 +161,3 @@ section {
     color: #443029;
 }
 
-
-/* src/assets/styles/global.css */
-
-/* ... (tu @import y :root) ... */
-
-/* =================================
-   2. STICKY FOOTER & LAYOUT RESET
-   ================================= */
-
-/* 1. Forzamos a toda la cadena a ocupar el 100% de la altura */
-html,
-body,
-#root { /* #root es el <div> donde se monta tu App de React */
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* 2. Nuestro layout (el <div> de PublicLayout)
-      se convierte en el contenedor flex principal */
-.public-layout-container {
-  display: flex;
-  flex-direction: column; /* Apila Header, main, Footer */
-  min-height: 100%;    /* Ocupa el 100% de su padre (#root) */
-}
-
-/* 3. El <main> (nuestro wrapper) se estira */
-.main-content-wrapper {
-  flex-grow: 1; /* <-- ¡LA CLAVE! Le dice al main que "crezca" y ocupe el espacio */
-
-  /* Mantenemos el padding para el header fijo */
-  padding-top: 157px; /* (Ajusta este valor si es necesario) */
-}
-
-@media (max-width: 991.98px) {
-  .main-content-wrapper {
-    padding-top: 80px; /* (Ajusta este valor si es necesario) */
-  }
-}
-
-/* =================================
-   3. ESTILOS GLOBALES (BODY, etc.)
-   ================================= */
-
-/* Ahora estilizamos 'body' (sin 'min-height', ya lo tiene arriba) */
-body {
-    font-family: var(--fuente-principal);
-    color: var(--color-letra-cafe);
-    background-color: var(--color-fondo-crema);
-}
