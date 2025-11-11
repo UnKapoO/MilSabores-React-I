@@ -1,0 +1,259 @@
+/* =================================
+   1. LAYOUT PRINCIPAL DEL HEADER
+   ================================= */
+.header-doble {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--color-fondo-crema);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* =================================
+   2. HEADER SUPERIOR
+   ================================= */
+.header-superior {
+    background-color: var(--color-acento-rosa);
+    border-bottom: 1px solid var(--color-acento-rosa);
+    padding: 12px 0;
+}
+
+.header-superior-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contacto-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-letra-cafe);
+    font-size: 14px;
+}
+.contacto-info i {
+    color: var(--color-letra-cafe); /* Corregido (asumo que querías café, no rosa) */
+    font-size: 16px;
+}
+.telefono {
+    font-weight: 600;
+}
+
+.logo-principal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo-principal img {
+    width: 40px;
+    height: 40px;
+}
+.logo-principal span {
+    font-size: 28px;
+    color: var(--color-letra-cafe);
+    font-weight: 400;
+}
+
+.usuario-carrito {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Estilos para los botones (ahora <Button variant="link">) */
+.btn-usuario,
+.btn-carrito {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-letra-cafe)!important;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    text-decoration: none !important; /* Importante para sobrescribir bootstrap */
+}
+
+.btn-usuario:hover,
+.btn-carrito:hover {
+    color: var(--color-acento-rosa);
+}
+
+.btn-usuario i,
+.btn-carrito i {
+    font-size: 18px;
+}
+
+.carrito-icon-wrapper{
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: var(--color-letra-cafe);
+}
+
+.cart-count {
+
+    position: absolute;
+    top: -5px;
+    right: -8px;
+
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    font-weight: 600;
+
+    background-color: var(--color-acento-rosa);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+/* =================================
+   3. HEADER INFERIOR (AHORA EL <NAVBAR>)
+   ================================= */
+   
+/* Usamos esta clase para darle color de fondo a <Navbar> */
+.header-inferior {
+    background-color: var(--color-acento-cafe);
+    padding: 15px 0;
+}
+
+/* Estilos para los <Nav.Link> dentro del <Nav> */
+.navegacion-principal a.nav-link { /* Más específico para Bootstrap */
+    color: var(--color-fondo-crema);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+    padding: 8px 0;
+    margin-right: 10px; /* Reemplaza el 'gap' del <ul> original */
+    margin-left: 10px;
+    border-bottom: 2px solid transparent; /* Borde inicial transparente */
+}
+
+.navegacion-principal a.nav-link:hover,
+.navegacion-principal a.nav-link.active { /* 'active' es la clase de NavLink */
+    color: var(--color-acento-rosa);
+    border-bottom: 2px solid #ffc0cb;
+}
+
+.busqueda-header {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-fondo-crema);
+    border-radius: 25px;
+    padding: 8px 20px;
+    min-width: 400px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    
+}
+
+.input-busqueda-header {
+    border: none;
+    background: none;
+    outline: none;
+    flex: 1;
+    color: var(--color-letra-cafe);
+    font-size: 14px;
+}
+.input-busqueda-header::placeholder {
+    color: var(--color-letra-gris);
+}
+
+.btn-buscar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-acento-cafe);
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+.btn-buscar:hover {
+    background-color: var(--color-acento-rosa);
+    color: white;
+}
+
+/* =================================
+   4. MENÚ MÓVIL (ELIMINADO)
+   ================================= */
+
+/* * ¡ELIMINADO!
+ * Todas las clases .btn-menu-movil, .menu-movil, .menu-movil.abierto,
+ * .menu-movil-header, .btn-cerrar-menu, y .navegacion-movil
+ * ya no son necesarias. Bootstrap se encarga de esto.
+ */
+
+/* =================================
+   5. RESPONSIVE (SIMPLIFICADO)
+   ================================= */
+   
+/* Esta media query se mantiene para reordenar el header-superior */
+@media (max-width: 992px) {
+    .header-superior-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .contacto-info { order: 2; }
+    .logo-principal { order: 1; }
+    .usuario-carrito { order: 3; }
+    
+    /* ¡ELIMINADO!
+     * Ya no necesitamos ocultar .header-inferior
+     * ni mostrar .btn-menu-movil.
+     */
+}
+
+/* Estas media queries se mantienen para limpiar la UI en móviles */
+@media (max-width: 768px) {
+    .contacto-info span:not(.telefono) {
+        display: none;
+    }
+    .carrito-texto {
+        display: none !important;
+    }
+    .busqueda-header {
+        min-width: 250px;
+    }
+    .logo-principal span {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-superior {
+        padding: 8px 0;
+    }
+    .logo-principal span {
+        font-size: 20px;
+    }
+    
+    /* ¡ELIMINADO! .menu-movil { width: 100% ... } */
+    
+    .busqueda-header {
+        min-width: 200px;
+        padding: 6px 15px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    .input-busqueda-header {
+        font-size: 13px;
+    }
+    .usuario-carrito {
+        gap: 15px;
+    }
+    .btn-usuario,
+    .btn-carrito {
+        font-size: 12px;
+    }
+    .btn-usuario i,
+    .btn-carrito i {
+        color: var(--color-letra-cafe);
+        font-size: 16px;
+    }
+}

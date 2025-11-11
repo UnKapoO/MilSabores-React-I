@@ -1,41 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css'; 
+import './assets/styles/global.css';
+import './assets/styles/header.css';
+import './assets/styles/footer.css';
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Navbar } from './components/Navbar'
-import { Footer } from './components/Footer'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import PublicLayout from './components/layout/PublicLayout';
 
-import { HomePage } from './pages/HomePage'
-import { CatalogoPage } from './pages/CatalogoPages'
-
-// Para probar cositas
-//const CatalogoPage = () => <h1 className="p-8 text-3xl">PÁGINA DE CATÁLOGO</h1>;
-const BlogPage = () => <h1 className="p-8 text-3xl">PÁGINA DE BLOG</h1>;
-const LoginPage = () => <h1 className="p-8 text-3xl">PÁGINA DE LOGIN</h1>;
-const CarritoPage = () => <h1 className="p-8 text-3xl">PÁGINA DE CARRITO</h1>;
+// --- Componentes temporales de página ---
+const CatalogoPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>¡Página de Catálogo!</h1>;
+const BlogPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>¡Página de Blog!</h1>;
+const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
+const HomePage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Inicio</h1>;
+const EspecialPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Tortas Especiales</h1>; 
+// ----------------------------------------
 
 function App() {
   return (
     <BrowserRouter>
-      <Navbar/>
-      {/* para que el footer se quede abajo a */}
-      <main style={{minHeight: '80vh'}}>
-        <Routes>
-          <Route path='/' element={<HomePage />}/>
-          <Route path='/catalogo' element={<CatalogoPage />}/>
-          <Route path='/blog' element={<BlogPage />}/>
-          <Route path="/login" element={<LoginPage />}/>
-          <Route path="/carrito" element={<CarritoPage />} />      
-        </Routes>
-      </main>
-      <Footer/>
-    </BrowserRouter>
+      <Routes>
 
-  )
+        {/* Ruta Principal (con Footer) */}
+        <Route 
+          path="/" 
+          element={ <PublicLayout><HomePage /></PublicLayout> } 
+        />
+
+        {/* Ruta de Login (sin Footer) */}
+        <Route 
+          path="/login" 
+          element={ <PublicLayout showFooter={false}><LoginPage /></PublicLayout> } 
+        />
+
+        {/* Ruta de Catálogo (con Footer) */}
+        <Route 
+          path="/catalogo" 
+          element={ <PublicLayout><CatalogoPage /></PublicLayout> } 
+        />
+
+        {/* Ruta de Blog (con Footer) */}
+        <Route 
+          path="/blog" 
+          element={ <PublicLayout><BlogPage /></PublicLayout> } 
+        />
+
+        {/*Ruta especiales */}
+        <Route
+          path='/especiales'
+          element={<PublicLayout><EspecialPage/></PublicLayout>}
+
+        />
+
+      </Routes>
+    </BrowserRouter>
+  );
 }
-export default App
+
+export default App;
+
 
 
 /*
