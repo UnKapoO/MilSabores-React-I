@@ -64,7 +64,7 @@ function Header() {
           {/* Este es el CONTENEDOR COLAPSABLE. */}
           <Navbar.Collapse id="main-navbar-nav">
 
-            <Nav className="me-auto navegacion-principal">
+            <Nav className="mx-auto navegacion-principal">
 
               {/* Usamos <Nav.Link> "as" (como) <NavLink> de react-router-dom.
                   Esto nos da la clase 'active' automáticamente al navegar.
