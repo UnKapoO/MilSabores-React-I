@@ -1,7 +1,4 @@
-import { Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-
-import styles from './ProductCard.module.css';
 import type { Product } from '../../types/Product';
 import { formatearPrecio } from '../../utils/formatters';
 
@@ -17,30 +14,31 @@ function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Card 
-      className={`h-100 ${styles.productCard}`}
+    // ¡Aquí está la traducción!
+    // Reemplazamos <Card> por <div> y .productCard por clases de Tailwind
+    <div 
+      className="h-full flex flex-col border border-gray-200 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
       onClick={handleViewDetails} 
     >
-    
-      {/* Card.Img es un hijo directo del <Card> con onClick */}
-      <Card.Img
-        variant="top"
-        src={product.imagen}
+      <img
+        src={`/${product.imagen}`} // Usamos la imagen de /public/img/
         alt={product.nombre}
-        className={styles.productImage}
+        className="w-full h-48 object-cover" // Clases de Tailwind
       />
-
-      <Card.Body className="d-flex flex-column flex-grow-1">
-        <Card.Title className={styles.productName}>{product.nombre}</Card.Title>
-
-        <div className={styles.productPrice}>
-          {formatearPrecio(product.precio)}
-        </div>
+      
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg font-bold text-dark mb-2">{product.nombre}</h3>
         
-        {/* El botón eliminado se queda eliminado, ¡perfecto! */}
-      </Card.Body>
-
-    </Card> // <-- Cierra el <Card> padre
+        <p className="text-xl font-bold text-primary mb-4 flex-grow">
+          {formatearPrecio(product.precio)}
+        </p>
+        
+        {/* Puedes agregar un botón aquí si quieres */}
+        <button className="w-full bg-acento-rosa text-letra-cafe font-bold py-2 px-4 rounded-full hover:bg-acento-cafe hover:text-white transition-colors">
+          Agregar al Carrito
+        </button>
+      </div>
+    </div>
   );
 }
 

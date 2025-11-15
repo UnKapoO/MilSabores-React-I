@@ -1,100 +1,50 @@
-import { Container, Button, Navbar, Nav } from "react-bootstrap";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 function Header() {
-  // El hook 'useNavigate' se encarga de la navegación
-  const navigate = useNavigate();
-
-  // Funciones para los botones del header superior
-  const handleNavigateLogin = () => navigate("/login");
-  const handleNavigateCarrito = () => navigate("/carrito");
-
   return (
-    <header className="header-doble">
-
-      {/* --- HEADER SUPERIOR --- */}
-      <div className="header-superior">
-        <Container>
-          <div className="header-superior-content">
-            <div className="contacto-info">
-              <i className="fa-solid fa-phone"></i>
-              <span>Soporte al cliente</span>
-              <span className="telefono">+56 9 99999999</span>
-            </div>
-
-            <div className="logo-principal">
-              <img src="/img/logo.jpg" alt="logo" />
-              <span className="pacifico-regular">Mil Sabores</span>
-            </div>
-
-            <div className="usuario-carrito">
-              {/* Usamos onClick con 'useNavigate' para la navegación */}
-              <Button
-                variant="link" // 'variant="link"' quita los estilos de botón
-                className="btn-usuario"
-                onClick={handleNavigateLogin}
-              >
-                <i className="fa-solid fa-user"></i>
-              </Button>
-              <Button
-                variant="link"
-                className="btn-carrito"
-                onClick={handleNavigateCarrito}
-              >
-                <div className="carrito-icon-wraper">
-                  <i className="fa-solid fa-cart-shopping"></i>
-                  <span className="cart-count">0</span>
-
-                </div>
-                <span className="carrito-texto">Carrito</span>
-
-              </Button>
-            </div>
+    <header className="fixed top-0 left-0 w-full z-50">
+      {/* Header Superior */}
+      <div className="bg-white shadow-sm">
+        <div className="container mx-auto px-4 h-16 flex justify-between items-center">
+          {/* Info Contacto */}
+          <div className="hidden md:flex items-center gap-2 text-letra-cafe">
+            <i className="fa-solid fa-phone"></i>
+            <span>Soporte al cliente</span>
+            <span className="font-bold">+56 9 99999999</span>
           </div>
-        </Container>
+          
+          {/* Logo Principal */}
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/img/logo.jpg" alt="logo" className="h-10 w-10 rounded-full" />
+            <span className="font-secundaria text-3xl text-dark">Mil Sabores</span>
+          </Link>
+          
+          {/* Usuario y Carrito */}
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="flex items-center gap-2 text-letra-cafe hover:text-primary">
+              <i className="fa-solid fa-user text-xl"></i>
+              <span className="hidden md:inline">Mi Cuenta</span>
+            </Link>
+            <Link to="/carrito" className="flex items-center gap-2 text-letra-cafe hover:text-primary">
+              <i className="fa-solid fa-cart-shopping text-xl"></i>
+              <span className="hidden md:inline">Carrito</span>
+              <span className="bg-acento-rosa text-letra-cafe text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {/* --- HEADER INFERIOR --- */}
-      <Navbar expand="lg" className="header-inferior" variant="dark" collapseOnSelect>
-        <Container>
-
-          {/* Este es el BOTÓN HAMBURGUESA.*/}
-          <Navbar.Toggle aria-controls="main-navbar-nav" />
-
-          {/* Este es el CONTENEDOR COLAPSABLE. */}
-          <Navbar.Collapse id="main-navbar-nav">
-
-            <Nav className="mx-auto navegacion-principal">
-
-              {/* Usamos <Nav.Link> "as" (como) <NavLink> de react-router-dom.
-                  Esto nos da la clase 'active' automáticamente al navegar.
-              */}
-              <Nav.Link as={NavLink} to="/" end>INICIO</Nav.Link>
-              <Nav.Link as={NavLink} to="/catalogo">CATÁLOGO</Nav.Link>
-              <Nav.Link as={NavLink} to="/especiales">TORTAS ESPECIALES</Nav.Link>
-              <Nav.Link as={NavLink} to="/sin-azucar">SIN AZÚCAR</Nav.Link>
-              <Nav.Link as={NavLink} to="/vegana">VEGANO</Nav.Link>
-              <Nav.Link as={NavLink} to="/blog">BLOG</Nav.Link>
-            </Nav>
-            
-            <div className="busqueda-header">
-              <input
-                type="text"
-                placeholder="Buscar..."
-                className="input-busqueda-header"
-              />
-              <button className="btn-buscar">
-                <i className="fa-solid fa-search"></i>
-              </button>
-            </div>
-
-
-
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      {/* Header Inferior (Navegación) */}
+      <div className="bg-fondo-crema h-12 flex justify-center items-center shadow-md">
+        <nav className="flex gap-8 font-bold text-letra-cafe uppercase text-sm">
+          <Link to="/" className="hover:text-primary">Inicio</Link>
+          <Link to="/catalogo" className="hover:text-primary">Catálogo</Link>
+          <Link to="/catalogo?categoria=especiales" className="hover:text-primary">Tortas Especiales</Link>
+          <Link to="/blog" className="hover:text-primary">Blog</Link>
+        </nav>
+        {/* Aquí iría el <div class="busqueda-header"> que también traducirían */}
+      </div>
     </header>
   );
 }
-
 export default Header;

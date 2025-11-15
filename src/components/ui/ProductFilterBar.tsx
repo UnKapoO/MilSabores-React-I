@@ -1,41 +1,39 @@
-import { Button } from 'react-bootstrap';
-import styles from './ProductFilterBar.module.css';
 import { obtenerNombreCategoria } from '../../utils/formatters';
 
 interface ProductFilterBarProps {
   categories: string[];
   activeCategory: string;
-  onFilterChange: (category: string) => void; 
+  onFilterChange: (category: string) => void;
 }
 
 function ProductFilterBar({ categories, activeCategory, onFilterChange }: ProductFilterBarProps) {
   return (
-    <section className={styles.filterBar}>
-      <div className={styles.filterContainer}>
-        {categories.map(category => {
+    // 1. Reemplazamos el <section> con clases de Tailwind
+    <section className="flex justify-center mb-8">
+      <div className="flex flex-wrap justify-center gap-3">
 
-          // 1. Determinamos si este botón es el activo
+        {categories.map(category => {
           const isActive = activeCategory === category;
 
-          // 2. Creamos la lista de clases dinámicamente
-          // Usamos nuestra clase base '.filterButton'
-          // y AÑADIMOS '.active' si isActive es true
-          const buttonClasses = `
-            ${styles.filterButton}
-            ${isActive ? styles.active : ""}
-          `;
-
           return (
-            <Button
+            // 2. Reemplazamos el <Button> de Bootstrap por un <button> normal
+            <button
               key={category}
               onClick={() => onFilterChange(category)}
-              variant="light" 
 
-          
-              className={buttonClasses.trim()} 
+              // 3. ¡AQUÍ LA MAGIA DE TAILWIND!
+              // Usamos un "ternario" para cambiar las clases dinámicamente
+              // basado en si el botón está activo o no.
+              className={`
+                py-2 px-5 rounded-full font-bold text-sm transition-all shadow-sm
+                ${isActive
+                  ? 'bg-primary text-white scale-105' // Estilo ACTIVO (usamos el color de tu config)
+                  : 'bg-white text-letra-cafe hover:bg-gray-100' // Estilo INACTIVO
+                }
+              `}
             >
               {obtenerNombreCategoria(category)}
-            </Button>
+            </button>
           );
         })}
       </div>

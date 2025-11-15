@@ -1,88 +1,80 @@
-// src/pages/public/CatalogoPage/CatalogoPage.tsx
-import React, { useState } from 'react'; // 1. ¡Importamos 'useState' desde React!
-import { Container, Row, Col } from 'react-bootstrap';
+// src/pages/public/CatalogoPage.tsx
+import React, { useState, useEffect } from 'react';
 import ProductFilterBar from '../../components/ui/ProductFilterBar';
 import { obtenerNombreCategoria } from '../../utils/formatters';
 import ProductCard from '../../components/ui/ProductCard';
-import dbData from '../../../db.json';
 import type { Product } from '../../types/Product';
 
-// --- Cargamos los datos ---
-const allProducts = dbData.productos as Product[];
-
-// Creamos la lista de categorías para los botones
-// 1. Obtenemos todas las categorías (ej: ["tortas-cuadradas", "tortas-circulares", ...])
-const allCategories = allProducts.map(p => p.categoria);
-// 2. Filtramos para que solo queden valores únicos
-const uniqueCategories = [...new Set(allCategories)];
-// 3. Añadimos "todas" al inicio
-const filterCategories = ["todas", ...uniqueCategories];
-
-
 function CatalogoPage() {
-
-  // 2. ¡AQUÍ ESTÁ EL ESTADO (STATE)!
-  // 'useState' nos da dos cosas:
-  // 1. 'activeCategory': La variable que GUARDA el estado (la memoria).
-  // 2. 'setActiveCategory': La función que USAMOS para CAMBIAR el estado.
-  // Le decimos que el valor inicial sea "todas".
-
+  // 1. Estado para guardar TODOS los productos del API
+  const [products, setProducts] = useState<Product[]>([]);
+  
+  // 2. Estado para el filtro (¡esto ya lo tenía tu compañera, está perfecto!)
   const [activeCategory, setActiveCategory] = useState("todas");
+  
+  // 3. Estado para las categorías
+  const [categories, setCategories] = useState<string[]>(["todas"]);
 
-  // 3. Lógica de Filtrado
-  // Filtramos la lista de productos ANTES de renderizar.
-  // Esta variable se recalcula CADA VEZ que el estado cambia.
-  const filteredProducts = allProducts.filter(product => {
-    // Si la categoría activa es "todas", devolvemos 'true' (mostramos todo)
+  // 4. useEffect para pedir los productos del API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/productos');
+        const data = await response.json();
+        setProducts(data); // Guardamos los productos en el estado
+
+        // Extraemos las categorías de los datos recibidos
+        const allCategories = data.map((p: Product) => p.categoria);
+        const uniqueCategories = [...new Set(allCategories)];
+        setCategories(["todas", ...uniqueCategories]);
+        
+      } catch (error) {
+        console.error("Error al cargar productos:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // 5. Lógica de Filtrado (ahora filtra el "estado" 'products')
+  const filteredProducts = products.filter(product => {
     if (activeCategory === "todas") {
       return true; 
     }
-    // Si no, solo devolvemos 'true' si la categoría del producto coincide
     return product.categoria === activeCategory;
   });
 
   return (
-    <Container className="py-5">
+    <div className="container mx-auto py-5">
       <section className="text-center mb-5">
-        <h1 className="pacifico-regular">Nuestro Catálogo</h1>
+        <h1 className="font-secundaria text-5xl">Nuestro Catálogo</h1>
       </section>
-
-      {/* 4. EL COMPONENTE DE FILTROS (EL "HIJO")
-       * Le pasamos:
-       * - La lista de botones a crear (categories)
-       * - Cuál es el botón activo (activeCategory)
-       * - La función para cambiar el estado (onFilterChange)
-      */}
+      
+      {/* (El FilterBar se romperá por el .module.css, lo arreglamos después) */}
       <ProductFilterBar 
-        categories={filterCategories}
+        categories={categories}
         activeCategory={activeCategory}
-        onFilterChange={setActiveCategory} // ¡Pasamos la función del 'useState' directo!
+        onFilterChange={setActiveCategory}
       />
 
-      {/* 5. EL GRID DE PRODUCTOS (EL RESULTADO) */}
-      <section>
-        <h2 className="mb-4">
-          {/* Usamos tu 'helper' para el título */}
+      <section className="mt-8">
+        <h2 className="text-3xl font-bold mb-4">
           {obtenerNombreCategoria(activeCategory)}
         </h2>
 
-        <Row>
-          {/* Hacemos .map() sobre la lista YA FILTRADA */}
+        {/* 6. Grid con Tailwind (reemplazando <Row> y <Col>) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProducts.map(product => (
-            <Col key={product.id} xs={12} md={6} lg={3} className="mb-4">
-              <ProductCard product={product} />
-            </Col>
+            <ProductCard key={product.id} product={product} />
           ))}
-        </Row>
+        </div>
 
-        {/* (Opcional) Mensaje si no hay productos */}
         {filteredProducts.length === 0 && (
-          <Col className="text-center">
+          <div className="text-center mt-10">
             <p>No se encontraron productos en esta categoría.</p>
-          </Col>
+          </div>
         )}
       </section>
-    </Container>
+    </div>
   );
 }
 

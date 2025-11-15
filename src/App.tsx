@@ -1,6 +1,5 @@
- import './assets/styles/global.css';
-import './assets/styles/header.css';
-import './assets/styles/footer.css';
+import './components/layout/Header.tsx';
+import './components/layout/Footer.tsx';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PublicLayout from './components/layout/PublicLayout';
