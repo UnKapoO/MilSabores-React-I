@@ -2,9 +2,9 @@ export interface Product {
   id: number;
   codigo: string;
   categoria: string;
-  nombre: string; // <-- Usamos 'nombre'
-  precio: number; // <-- Usamos 'precio'
+  nombre: string; 
+  precio: number;
   descripcion: string;
-  imagen: string; // <-- Usamos 'imagen'
+  imagen: string; 
   icono: string;
 }

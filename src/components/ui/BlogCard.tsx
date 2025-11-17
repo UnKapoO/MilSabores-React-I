@@ -1,47 +1,65 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from './common/Button'; 
+import { formatearFecha, obtenerNombreCategoriaBlog } from '../../utils/formatters';
 
-// Definimos la "forma" de un post (según tu db.json)
+// 1. Definimos la nueva "forma" del Post (¡con autor y contenido!)
 interface BlogPost {
     id: number;
+    categoria: string;
     titulo: string;
-    fecha: string;
     resumen: string;
+    fecha: string;
+    autor: string;
     imagen: string;
+    contenido: string; 
 }
 
-// Definimos las props que recibirá
 interface BlogCardProps {
     post: BlogPost;
+    // Añadimos una prop para manejar el clic y abrir el modal
+    onClick: () => void;
 }
 
-// Usamos 'export default' para consistencia con los otros componentes
-const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
-
+const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
     return (
-        // "Traducción" de tu .card-blog a Tailwind
-        // (h-full es para que todas las tarjetas tengan el mismo alto en un grid)
-        <div className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+        // 3. Traducimos tu .articulo-card
+        <div
+            className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-md 
+                transition-all duration-300 hover:shadow-xl hover:-translate-y-1 
+                h-full cursor-pointer"
+            onClick={onClick} 
+        >
 
-            {/* Imagen del Post */}
+            {/* 5. Traducimos tu .articulo-imagen */}
             <div className="relative">
                 <img
                     src={`/${post.imagen}`}
                     alt={post.titulo}
                     className="w-full h-48 object-cover"
                 />
+                {/* 6. Traducimos tu .categoria-badge */}
+                <span
+                    className="absolute top-3 left-3 bg-primary text-white 
+                    text-xs font-bold uppercase px-2 py-1 rounded shadow-lg"
+                >
+                    {obtenerNombreCategoriaBlog(post.categoria)}
+                </span>
             </div>
 
-            {/* "Traducción" de tu .content-blog */}
+            {/* 7. Traducimos tu .articulo-info */}
             <div className="p-6 flex flex-col flex-grow">
+                <div className="flex items-center text-sm text-letra-gris mb-2 gap-4">
+                    {/* 8. Fecha (con nuestra función de formateo) */}
+                    <span className="flex items-center gap-1">
+                        <i className="fa-solid fa-calendar"></i>
+                        {formatearFecha(post.fecha)}
+                    </span>
+                    {/* 9. Autor */}
+                    <span className="flex items-center gap-1">
+                        <i className="fa-solid fa-user"></i>
+                        {post.autor}
+                    </span>
+                </div>
 
-                {/* Usamos el color 'primary' de tu config */}
-                <span className="text-primary text-sm font-medium mb-2">
-                    {post.fecha}
-                </span>
-
-                {/* Usamos el color 'dark' de tu config */}
                 <h3 className="text-xl font-bold text-dark mb-3">
                     {post.titulo}
                 </h3>
@@ -50,12 +68,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
                     {post.resumen}
                 </p>
 
-                {/* ¡Reutilizamos nuestro Button! */}
-                <Link to={`/blog/${post.id}`} className="mt-auto">
-                    <Button variant="primary" className="w-full">
-                        Leer más
-                    </Button>
-                </Link>
+                {/* 10. Footer con botón "Leer más" */}
+                <div className="mt-auto text-primary font-bold hover:underline">
+                    Leer más <i className="fa-solid fa-arrow-right ml-1"></i>
+                </div>
             </div>
         </div>
     );

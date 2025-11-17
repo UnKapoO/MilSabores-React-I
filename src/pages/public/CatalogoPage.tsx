@@ -1,5 +1,5 @@
 // src/pages/public/CatalogoPage.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ProductFilterBar from '../../components/ui/ProductFilterBar';
 import { obtenerNombreCategoria } from '../../utils/formatters';
 import ProductCard from '../../components/ui/ProductCard';
@@ -53,6 +53,7 @@ function CatalogoPage() {
         categories={categories}
         activeCategory={activeCategory}
         onFilterChange={setActiveCategory}
+        getCategoryName={obtenerNombreCategoria}
       />
 
       <section className="mt-8">

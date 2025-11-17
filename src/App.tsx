@@ -5,10 +5,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PublicLayout from './components/layout/PublicLayout';
 import HomePage from './pages/public/HomePage';
 import CatalogoPage from './pages/public/CatalogoPage';
-
+import BlogPage from './pages/public/BlogPage.tsx';
 
 // (Componentes temporales para las otras rutas)
-const BlogPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>¡Página de Blog!</h1>;
 const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
 
 function App() {

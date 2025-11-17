@@ -1,18 +1,20 @@
 // src/pages/public/HomePage.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../../components/ui/ProductCard';
 import type { Product } from '../../types/Product';
 import { FeatureCard } from '../../components/ui/FeatureCard';
 import { CategoryCard } from '../../components/ui/CategoryCard';
 import BlogCard from '../../components/ui/BlogCard';
-
 interface BlogPost {
   id: number;
+  categoria: string,
   titulo: string;
-  fecha: string;
   resumen: string;
+  fecha: string;
+  autor: string;
   imagen: string;
+  contenido: string;
 }
 
 function HomePage() {
@@ -41,6 +43,7 @@ function HomePage() {
     },
   ];
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+
   // 1. Creamos un "estado" para guardar los productos que lleguen del API
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
@@ -186,10 +189,20 @@ function HomePage() {
           <h2 className="text-4xl font-secundaria text-dark text-center mb-10">
             Últimas Noticias
           </h2>
-          {/* Usamos el nuevo estado 'blogPosts' y el nuevo 'BlogCard' */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
-              <BlogCard key={post.id} post={post} />
+              // Envolvemos la tarjeta en un <Link> que pasa "estado"
+              <Link
+                key={post.id}
+                to="/blog" // Navega a la página de Blog
+                // "state" es el "mensaje secreto" que le enviamos a la página /blog
+                state={{ openPostId: post.id }}
+              >
+                <BlogCard
+                  post={post}
+                  onClick={() => { }} // Pasamos una función vacía (o modificamos BlogCard para que onClick sea opcional)
+                />
+              </Link>
             ))}
           </div>
         </div>

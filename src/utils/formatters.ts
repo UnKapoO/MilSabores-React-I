@@ -21,3 +21,23 @@ export function obtenerNombreCategoria(categoria: string): string {
     };
     return categorias[categoria] || categoria;
 }
+
+export function formatearFecha(fechaISO: string): string {
+    const opciones: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    };
+    // Agregamos + 'T00:00:00' para evitar problemas de zona horaria
+    return new Date(fechaISO + 'T00:00:00').toLocaleDateString('es-CL', opciones);
+}
+
+export function obtenerNombreCategoriaBlog(categoria: string): string {
+    const categorias: { [key: string]: string } = {
+        recetas: 'Recetas',
+        noticias: 'Noticias',
+        consejos: 'Consejos',
+        eventos: 'Eventos',
+    };
+    return categorias[categoria] || 'General';
+}
