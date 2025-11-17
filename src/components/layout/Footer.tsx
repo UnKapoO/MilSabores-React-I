@@ -16,7 +16,7 @@ function Footer() {
           {/* 1. Sección Logo y Redes */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <img src="/img/logo.jpg" alt="Mil Sabores Logo" className="h-10 w-10 rounded-full" />
+              <img src="/img/logo.jpg" alt="Mil Sabores Logo" className="bg-fondo-crema h-10 w-10 rounded-lg" />
               {/* Usamos 'font-secundaria' (Pacifico) de tu config */}
               <span className="font-secundaria text-2xl">Mil Sabores</span>
             </div>

@@ -4,7 +4,7 @@ function Header() {
   return (
     <header className="fixed top-0 left-0 w-full z-50">
       {/* Header Superior */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-acento-rosa shadow-sm">
         <div className="container mx-auto px-4 h-16 flex justify-between items-center">
           {/* Info Contacto */}
           <div className="hidden md:flex items-center gap-2 text-letra-cafe">
@@ -16,7 +16,7 @@ function Header() {
           {/* Logo Principal */}
           <Link to="/" className="flex items-center gap-3">
             <img src="/img/logo.jpg" alt="logo" className="h-10 w-10 rounded-full" />
-            <span className="font-secundaria text-3xl text-dark">Mil Sabores</span>
+            <span className="font-secundaria text-3xl text-letra-cafe">Mil Sabores</span>
           </Link>
           
           {/* Usuario y Carrito */}

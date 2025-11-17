@@ -13,7 +13,7 @@ function PublicLayout({ children, showFooter = true }: PublicLayoutProps) {
     <div className="public-layout-container">
       <Header />
       
-      <main className="main-content-wrapper">
+      <main className='pt-28' style={{minHeight: '80vh'}}>
         {children}
       </main>
 

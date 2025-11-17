@@ -20,7 +20,7 @@ function CatalogoPage() {
     const fetchProducts = async () => {
       try {
         const response = await fetch('http://localhost:3001/productos');
-        const data = await response.json();
+        const data: Product[] = await response.json();
         setProducts(data); // Guardamos los productos en el estado
 
         // Extraemos las categorías de los datos recibidos
@@ -49,7 +49,6 @@ function CatalogoPage() {
         <h1 className="font-secundaria text-5xl">Nuestro Catálogo</h1>
       </section>
       
-      {/* (El FilterBar se romperá por el .module.css, lo arreglamos después) */}
       <ProductFilterBar 
         categories={categories}
         activeCategory={activeCategory}

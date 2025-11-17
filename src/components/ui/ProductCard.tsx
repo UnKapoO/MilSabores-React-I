@@ -14,10 +14,9 @@ function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    // ¡Aquí está la traducción!
     // Reemplazamos <Card> por <div> y .productCard por clases de Tailwind
     <div 
-      className="h-full flex flex-col border border-gray-200 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+      className="bg-white h-full flex flex-col border border-white-200 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
       onClick={handleViewDetails} 
     >
       <img
@@ -29,7 +28,7 @@ function ProductCard({ product }: ProductCardProps) {
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-lg font-bold text-dark mb-2">{product.nombre}</h3>
         
-        <p className="text-xl font-bold text-primary mb-4 flex-grow">
+        <p className="text-xl font-bold text-dark mb-4 flex-grow">
           {formatearPrecio(product.precio)}
         </p>
         
