@@ -3,7 +3,7 @@ import React from 'react';
 // --- Definimos las Propiedades (Props) que recibirá ---
 interface InputFieldProps {
     label: string; // El texto que va arriba (ej: "Correo electrónico")
-    type: 'text' | 'email' | 'password' | 'number' | 'date'; // Tipos de input que aceptará
+    type: 'text' | 'email' | 'password' | 'number' | 'date' | 'tel'; // Tipos de input que aceptará
     placeholder?: string; // El texto de ejemplo (opcional)
     name: string; // El 'name' del input, importante para los formularios
 
@@ -12,6 +12,8 @@ interface InputFieldProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 
     className?: string; // Para clases extra (opcional)
+    min?: string; 
+    max?: string;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -21,7 +23,9 @@ export const InputField: React.FC<InputFieldProps> = ({
     name,
     value,
     onChange,
-    className = ''
+    className = '',
+    min,
+    max
 }) => {
     return (
         // 1. Reemplazamos el <div class="form-group">
@@ -44,7 +48,8 @@ export const InputField: React.FC<InputFieldProps> = ({
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
-                // ¡La "traducción" a Tailwind!
+                min={min}
+                max={max}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md 
                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                 text-letra-cafe"

@@ -12,12 +12,12 @@ interface OrderSummaryProps {
 
     // Props para el botón (para que cambie)
     buttonText: string;
-    onButtonClick: () => void; // La función que se ejecutará al hacer clic
-
+    onButtonClick?: () => void; // La función que se ejecutará al hacer clic
+    buttonType?: 'button' | 'submit';
     // Props para el input de descuento
-    promoCode: string;
-    onPromoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onApplyPromo: () => void;
+    promoCode?: string;
+    onPromoChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onApplyPromo?: () => void;
 }
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({
@@ -27,6 +27,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
     total,
     buttonText,
     onButtonClick,
+    buttonType = 'button',
     promoCode,
     onPromoChange,
     onApplyPromo
@@ -63,35 +64,38 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
             </div>
 
             {/* 3. Input de Descuento (¡reutilizamos InputField!) */}
-            <div className="mt-6">
-                <label className="block text-letra-cafe font-bold mb-1">
-                    Código de Descuento
-                </label>
-                <div className="flex gap-2">
-                    <InputField
-                        label="" // Ocultamos el label de InputField
-                        name="promo"
-                        type="text"
-                        placeholder="EJ: FELICES50"
-                        value={promoCode}
-                        onChange={onPromoChange}
-                        className="mb-0" // Quitamos el margen de abajo
-                    />
-                    <Button variant="outline" onClick={onApplyPromo} className="shrink-0">
-                        Aplicar
-                    </Button>
+            {/* 3. Input de Descuento (¡AHORA CONDICIONAL!) */}
+            {/* Esto solo se mostrará si le pasamos la prop 'onPromoChange' */}
+            {onPromoChange && (
+                <div className="mt-6">
+                    <label className="block text-letra-cafe font-bold mb-1">
+                        Código de Descuento
+                    </label>
+                    <div className="flex gap-2">
+                        <InputField
+                            label=""
+                            name="promo"
+                            type="text"
+                            placeholder="EJ: FELICES50"
+                            value={promoCode || ''} // Usamos || '' por si acaso
+                            onChange={onPromoChange}
+                            className="mb-0"
+                        />
+                        <Button variant="outline" onClick={onApplyPromo} className="shrink-0">
+                            Aplicar
+                        </Button>
+                    </div>
                 </div>
-            </div>
-
-            {/* 4. Botón de Acción (¡reutilizamos Button!) */}
+            )}
+            {/* 4. Botón de Acción */}
             <Button
                 variant="primary"
                 onClick={onButtonClick}
-                className="w-full mt-6" // className="w-full" lo hace ocupar todo el ancho
+                type={buttonType}
+                className="w-full mt-6"
             >
                 {buttonText} <i className="fa-solid fa-arrow-right ml-2"></i>
             </Button>
-
             <div className="text-center text-sm text-letra-gris mt-4 flex items-center justify-center gap-2">
                 <i className="fa-solid fa-shield-alt"></i>
                 <span>Compra 100% segura y protegida</span>

@@ -26,7 +26,6 @@ function ProductDetailPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [recomendados, setRecomendados] = useState<Product[]>([]);
 
-    // --- ¡NUEVOS ESTADOS PARA LOS MODALES! (Copiados de CatalogoPage) ---
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isPersonalizeModalOpen, setIsPersonalizeModalOpen] = useState(false);
     const [selectedCantidad, setSelectedCantidad] = useState(1); // ¡Guardamos la cantidad del botón!
