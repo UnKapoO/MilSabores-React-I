@@ -18,6 +18,7 @@ interface SelectFieldProps {
     options: SelectOption[];
 
     className?: string;
+    error?: string;
 }
 
 export const SelectField: React.FC<SelectFieldProps> = ({
@@ -26,7 +27,8 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     value,
     onChange,
     options,
-    className = ''
+    className = '',
+    error
 }) => {
     return (
         // 1. Contenedor (igual que InputField)
@@ -47,9 +49,10 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 value={value}
                 onChange={onChange}
                 // "Traducción" a Tailwind. Le damos la misma apariencia que el InputField
-                className="w-full px-4 py-2 border border-gray-300 rounded-md 
-                    focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-                    text-letra-cafe"
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-letra-cafe 
+                    ${error 
+                        ? 'border-red-500 focus:ring-red-200' 
+                        : 'border-gray-300 focus:ring-primary'}`}
             >
                 {/* 4. Usamos .map() para crear todas las <option> */}
                 {options.map((option) => (
@@ -58,6 +61,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                     </option>
                 ))}
             </select>
+            {error && <small className="text-red-500 text-sm mt-1">{error}</small>}
         </div>
     );
 };

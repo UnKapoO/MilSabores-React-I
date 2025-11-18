@@ -5,7 +5,7 @@ import { Button } from './common/Button';
 import { SelectField } from './common/SelectField';
 import { InputField } from './common/InputField';
 
-// Opciones de tamaño de tu JS
+// Opciones de tamaño
 const opcionesTamano = [
     { value: "", label: "Selecciona el tamaño *" },
     { value: "0.8", label: "Pequeño (4-6 personas) - 20% menos" },
@@ -14,7 +14,7 @@ const opcionesTamano = [
     { value: "1.6", label: "Extra Grande (18-20 personas) - 60% más" },
 ];
 
-// Opciones de color de tu JS
+// Opciones de color
 const opcionesColor = [
     { value: "", label: "Selecciona un color *" },
     { value: "blanco", label: "Blanco clásico" },
@@ -30,27 +30,30 @@ interface PersonalizationFormProps {
 }
 
 export const PersonalizationForm: React.FC<PersonalizationFormProps> = ({ product, onAddToCart, onCancel }) => {
-    // Estados para el formulario
-    const [tamano, setTamano] = useState("1"); // Estándar por defecto
+    // Estados del formulario
+    const [tamano, setTamano] = useState("1");
     const [mensaje, setMensaje] = useState("");
     const [color, setColor] = useState("");
     const [precioFinal, setPrecioFinal] = useState(product.precio);
 
-    // Estado para los errores (como en tu JS)
+    // Estados de error
     const [errorTamano, setErrorTamano] = useState("");
     const [errorColor, setErrorColor] = useState("");
+    const [errorMensaje, setErrorMensaje] = useState(""); // <-- ¡Error para el mensaje!
 
-    // Lógica para calcular el precio (como en tu JS)
+    // Cálculo de precio
     useEffect(() => {
         const multiplicador = parseFloat(tamano) || 1;
-        const nuevoPrecio = product.precio * multiplicador;
-        setPrecioFinal(nuevoPrecio);
+        setPrecioFinal(product.precio * multiplicador);
     }, [tamano, product.precio]);
 
-    // Lógica de validación (como en tu JS)
+    // Validación y Envío
     const handleSubmit = () => {
+        // 1. Limpiar errores previos
         setErrorTamano("");
         setErrorColor("");
+        setErrorMensaje("");
+
         let hayErrores = false;
 
         if (!tamano) {
@@ -62,9 +65,15 @@ export const PersonalizationForm: React.FC<PersonalizationFormProps> = ({ produc
             hayErrores = true;
         }
 
+        // Validación ESTRICTA del mensaje
+        if (mensaje.length > 50) {
+            setErrorMensaje("El mensaje es demasiado largo (máx 50 caracteres)");
+            hayErrores = true;
+        }
+
         if (hayErrores) return;
 
-        // Si pasa la validación, llamamos a la función del padre
+        // Si todo está bien, enviamos
         onAddToCart({
             cantidadPersonas: opcionesTamano.find(o => o.value === tamano)?.label,
             mensajeEspecial: mensaje,
@@ -73,9 +82,10 @@ export const PersonalizationForm: React.FC<PersonalizationFormProps> = ({ produc
     };
 
     return (
-        <div className="bg-fondo-crema flex flex-col gap-4">
+        <div className="bg-fondo-crema flex flex-col gap-4"> {/* <-- Fondo Crema si lo querías aquí */}
+
             {/* 1. Preview del Producto */}
-            <div className="bg-white flex gap-4 items-center p-4 rounded-lg">
+            <div className="bg-white flex gap-4 items-center p-4 rounded-lg border border-gray-200">
                 <img src={`/${product.imagen}`} alt={product.nombre} className="w-20 h-20 rounded-md object-cover" />
                 <div>
                     <h4 className="font-bold text-lg text-dark">{product.nombre}</h4>
@@ -84,41 +94,67 @@ export const PersonalizationForm: React.FC<PersonalizationFormProps> = ({ produc
             </div>
 
             {/* 2. Formulario */}
-            <form>
-                <SelectField
-                    label="Cantidad de Personas"
-                    name="tamano"
-                    value={tamano}
-                    onChange={(e) => setTamano(e.target.value)}
-                    options={opcionesTamano}
-                />
-                {errorTamano && <p className="text-red-500 text-sm -mt-2 mb-2">{errorTamano}</p>}
+            <form className="space-y-2"> 
 
-                <SelectField
-                    label="Color del Glaseado"
-                    name="color"
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                    options={opcionesColor}
-                />
-                {errorColor && <p className="text-red-500 text-sm -mt-2 mb-2">{errorColor}</p>}
+                {/* Tamaño */}
+                <div>
+                    <SelectField
+                        label="Cantidad de Personas"
+                        name="tamano"
+                        value={tamano}
+                        onChange={(e) => setTamano(e.target.value)}
+                        options={opcionesTamano}
+                        className="mb-1" // Menos margen para mostrar el error cerca
+                    />
+                    {errorTamano && <p className="text-red-500 text-sm mb-2">{errorTamano}</p>}
+                </div>
 
-                <InputField
-                    label="Mensaje Especial (opcional)"
-                    name="mensaje"
-                    type="text"
-                    placeholder="Ej: Feliz Cumpleaños"
-                    value={mensaje}
-                    onChange={(e) => setMensaje(e.target.value)}
-                    className="mb-0" // Quitamos margen para el contador
-                />
-                <small className="text-letra-gris text-xs">{mensaje.length}/50 caracteres</small>
+                {/* Color */}
+                <div>
+                    <SelectField
+                        label="Color del Glaseado"
+                        name="color"
+                        value={color}
+                        onChange={(e) => setColor(e.target.value)}
+                        options={opcionesColor}
+                        className="mb-1"
+                    />
+                    {errorColor && <p className="text-red-500 text-sm mb-2">{errorColor}</p>}
+                </div>
+
+                {/* Mensaje (Con validación y contador) */}
+                <div>
+                    <InputField
+                        label="Mensaje Especial (opcional)"
+                        name="mensaje"
+                        type="text"
+                        placeholder="Ej: Feliz Cumpleaños"
+                        value={mensaje}
+                        onChange={(e) => setMensaje(e.target.value)}
+                        className="mb-1"
+                    // maxLength={50} // Lo quitamos para permitir que el usuario se equivoque y vea el error rojo
+                    />
+
+                    {/* Contador de caracteres inteligente */}
+                    <div className="flex justify-between text-xs px-1">
+                        <span className={`${mensaje.length > 50 ? 'text-red-500 font-bold' : 'text-letra-gris'}`}>
+                            {mensaje.length}/50 caracteres
+                        </span>
+                        {/* Mensaje de error visual */}
+                        {mensaje.length > 50 && (
+                            <span className="text-red-500 font-bold">¡Límite excedido!</span>
+                        )}
+                    </div>
+                    {/* Mensaje de error formal (si intenta enviar) */}
+                    {errorMensaje && <p className="text-red-500 text-sm mt-1">{errorMensaje}</p>}
+                </div>
+
             </form>
 
             {/* 3. Footer del Formulario */}
-            <div className="mt-4">
+            <div className="mt-4 pt-4 border-t border-gray-200">
                 <p className="text-2xl font-bold text-dark text-right mb-4">
-                    Precio Final: {formatearPrecio(precioFinal)}
+                    Precio Final: <span className="text-primary">{formatearPrecio(precioFinal)}</span>
                 </p>
                 <div className="flex justify-end gap-4">
                     <Button variant="outline" onClick={onCancel}>

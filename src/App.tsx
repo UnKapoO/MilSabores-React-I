@@ -7,6 +7,8 @@ import ProductDetailPage from './pages/public/ProductDetailPage';
 import ScrollToTop from './utils/ScrollToTop';
 import CarritoPage from './pages/public/CarritoPage';
 import CheckoutPage from './pages/public/CheckoutPage';
+import ConfirmacionPage from './pages/public/ConfirmacionPage';
+
 // (Componentes temporales para las otras rutas)
 const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
 
@@ -25,6 +27,7 @@ function App() {
         <Route path="/blog" element={ <PublicLayout><BlogPage /></PublicLayout> } />
         <Route path="/carrito" element={ <PublicLayout><CarritoPage /></PublicLayout> } />
         <Route path="/checkout" element={ <PublicLayout><CheckoutPage /></PublicLayout> } />
+        <Route path='/confirmacion' element={ <PublicLayout><ConfirmacionPage /></PublicLayout>} />
       </Routes>
     </BrowserRouter>
   );
