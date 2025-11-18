@@ -9,6 +9,9 @@ export function formatearPrecio(precio: number): string {
 }
 
 export function obtenerNombreCategoria(categoria: string): string {
+    if (categoria === 'todas') {
+    return 'Todas';
+    }
     const categorias: { [key: string]: string } = {
         "tortas-cuadradas": "Tortas Cuadradas",
         "tortas-circulares": "Tortas Circulares",
@@ -33,6 +36,9 @@ export function formatearFecha(fechaISO: string): string {
 }
 
 export function obtenerNombreCategoriaBlog(categoria: string): string {
+    if (categoria === 'todas') {
+    return 'Todas';
+    }
     const categorias: { [key: string]: string } = {
         recetas: 'Recetas',
         noticias: 'Noticias',

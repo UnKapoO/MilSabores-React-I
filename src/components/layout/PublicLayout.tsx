@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import NotificationToast from '../ui/common/NotificationToast';
 
 interface PublicLayoutProps {
   children: React.ReactNode; 
@@ -12,7 +13,7 @@ function PublicLayout({ children, showFooter = true }: PublicLayoutProps) {
     // Este <div> es CRÍTICO para la solución
     <div className="public-layout-container">
       <Header />
-      
+      <NotificationToast />
       <main className='pt-28' style={{minHeight: '80vh'}}>
         {children}
       </main>

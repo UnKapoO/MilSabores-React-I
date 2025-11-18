@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
 function Header() {
+  const { cart } = useCart();
+  const totalItems = cart.reduce((total, item) => total + item.cantidad, 0)
   return (
     <header className="fixed top-0 left-0 w-full z-50">
       {/* Header Superior */}
@@ -12,13 +15,13 @@ function Header() {
             <span>Soporte al cliente</span>
             <span className="font-bold">+56 9 99999999</span>
           </div>
-          
+
           {/* Logo Principal */}
           <Link to="/" className="flex items-center gap-3">
             <img src="/img/logo.jpg" alt="logo" className="h-10 w-10 rounded-full" />
             <span className="font-secundaria text-3xl text-letra-cafe">Mil Sabores</span>
           </Link>
-          
+
           {/* Usuario y Carrito */}
           <div className="flex items-center gap-4">
             <Link to="/login" className="flex items-center gap-2 text-letra-cafe hover:text-primary">
@@ -28,7 +31,11 @@ function Header() {
             <Link to="/carrito" className="flex items-center gap-2 text-letra-cafe hover:text-primary">
               <i className="fa-solid fa-cart-shopping text-xl"></i>
               <span className="hidden md:inline">Carrito</span>
-              <span className="bg-acento-rosa text-letra-cafe text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+              {totalItems > 0 && (
+                <span className="bg-acento-rosa text-letra-cafe text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems} {/* <-- Mostramos el total real */}
+                </span>
+              )}
             </Link>
           </div>
         </div>

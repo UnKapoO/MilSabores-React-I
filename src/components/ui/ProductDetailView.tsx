@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import type { Product } from '../../types/Product';
 import { formatearPrecio } from '../../utils/formatters';
 import { Button } from './common/Button';
+// ¡Quitamos 'useCart' y 'ProductCustomizer'!
 
-// --- Definimos las Props que recibirá ---
+// --- 1. Definimos las Props NUEVAS ---
+// Ya no es 'inteligente', así que necesita que el "padre" le diga qué hacer
 interface ProductDetailViewProps {
     product: Product;
-    onAddToCart: (product: Product, cantidad: number) => void;
+    onAddToCartClick: (cantidad: number) => void; // Solo "avisa" al padre
 }
 
-export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, onAddToCart }) => {
-    // Estado para manejar el selector de cantidad
+export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, onAddToCartClick }) => {
+    // El estado de 'cantidad' se queda aquí, ¡eso está bien!
     const [cantidad, setCantidad] = useState(1);
 
     const handleIncrease = () => {
@@ -18,51 +20,49 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, o
     };
 
     const handleDecrease = () => {
-        setCantidad(prev => (prev > 1 ? prev - 1 : 1)); // No deja bajar de 1
+        setCantidad(prev => (prev > 1 ? prev - 1 : 1));
     };
 
-    const handleAddToCartClick = () => {
-        onAddToCart(product, cantidad);
+    // 2. El handler AHORA solo "avisa" al padre
+    const handleAddToCart = () => {
+        onAddToCartClick(cantidad); // Pasa la cantidad seleccionada al padre
     };
 
     return (
-        // 1. Grid principal (2 columnas en escritorio)
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
-            {/* --- COLUMNA IZQUIERDA: IMAGEN --- */}
+            {/* --- COLUMNA IZQUIERDA: IMAGEN (Sin cambios) --- */}
             <div className="bg-white p-4 rounded-lg shadow-md border">
                 <img
                     src={`/${product.imagen}`}
                     alt={product.nombre}
                     className="w-full h-auto object-cover rounded-lg"
                 />
-                {/* (Aquí se podría agregar una galería de thumbnails si hubiera más imágenes) */}
             </div>
 
             {/* --- COLUMNA DERECHA: INFORMACIÓN --- */}
             <div>
-                {/* 2. Nombre del Producto (fuente secundaria) */}
                 <h1 className="font-secundaria text-5xl text-dark mb-4">{product.nombre}</h1>
 
-                {/* 3. Precio */}
+                {/* 3. El precio ahora es siempre el 'base' (ya no usamos 'currentPrice') */}
                 <p className="text-4xl font-bold text-primary mb-6">
                     {formatearPrecio(product.precio)}
                 </p>
 
-                {/* 4. Descripción */}
                 <p className="text-letra-cafe text-lg mb-6 leading-relaxed">
                     {product.descripcion}
                 </p>
 
-                {/* 5. Detalles (Código y Categoría) */}
                 <div className="text-sm text-letra-gris space-y-1 mb-8">
                     <p><strong>Código:</strong> {product.codigo}</p>
                     <p><strong>Categoría:</strong> <span className="capitalize">{product.categoria.replace('-', ' ')}</span></p>
                 </div>
 
-                {/* 6. Selector de Cantidad + Botón de Añadir */}
-                <div className="flex items-center gap-4">
-                    {/* Selector (copiado de CartItem) */}
+                {/* 4. ¡BORRAMOS EL <ProductCustomizer> DE AQUÍ! */}
+
+                {/* 5. Selector de Cantidad + Botón de Añadir */}
+                <div className="flex items-center gap-4 mt-8">
+                    {/* Selector de cantidad (sin cambios) */}
                     <div className="flex items-center border border-gray-300 rounded-full">
                         <button
                             onClick={handleDecrease}
@@ -81,11 +81,11 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, o
                         </button>
                     </div>
 
-                    {/* Botón de Añadir */}
+                    {/* Botón (ahora llama a 'handleAddToCart') */}
                     <Button
                         variant="primary"
-                        onClick={handleAddToCartClick}
-                        className="flex-grow text-lg" // Hacemos que el botón sea más grande
+                        onClick={handleAddToCart}
+                        className="flex-grow text-lg"
                     >
                         <i className="fa-solid fa-cart-plus mr-2"></i>
                         Agregar al Carrito

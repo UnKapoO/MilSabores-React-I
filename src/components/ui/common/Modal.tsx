@@ -44,7 +44,7 @@ export const Modal: React.FC<ModalProps> = ({
 
             {/* 3. ¡Usamos la nueva 'sizeClass' aquí! */}
             <div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-            bg-white rounded-lg shadow-xl z-50 w-11/12 ${sizeClass}
+            bg-fondo-crema rounded-lg shadow-xl z-50 w-11/12 ${sizeClass}
             flex flex-col`}>
 
                 <header className="flex justify-between items-center p-4 border-b">
@@ -56,8 +56,6 @@ export const Modal: React.FC<ModalProps> = ({
                         <i className="fa-solid fa-xmark fa-xl"></i>
                     </button>
                 </header>
-
-                {/* 4. ¡AQUÍ ESTÁ EL ARREGLO DEL SCROLL! */}
                 <main className="p-6 max-h-[70vh] overflow-y-auto">
                     {children}
                 </main>
