@@ -31,8 +31,11 @@ export function formatearFecha(fechaISO: string): string {
         month: 'long',
         day: 'numeric',
     };
+    const fechaAParsear = fechaISO.includes('T') 
+    ? fechaISO 
+    : fechaISO + 'T00:00:00';
     // Agregamos + 'T00:00:00' para evitar problemas de zona horaria
-    return new Date(fechaISO + 'T00:00:00').toLocaleDateString('es-CL', opciones);
+    return new Date(fechaAParsear).toLocaleDateString('es-CL', opciones);
 }
 
 export function obtenerNombreCategoriaBlog(categoria: string): string {

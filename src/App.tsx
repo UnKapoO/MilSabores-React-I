@@ -10,6 +10,7 @@ import CheckoutPage from './pages/public/CheckoutPage';
 import ConfirmacionPage from './pages/public/ConfirmacionPage';
 import LoginPage from './pages/public/LoginPage';
 import RegisterPage from './pages/public/RegisterPage';
+import UserProfilePage from './pages/public/UserProfilePage';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/carrito" element={ <PublicLayout><CarritoPage /></PublicLayout> } />
         <Route path="/checkout" element={ <PublicLayout><CheckoutPage /></PublicLayout> } />
         <Route path='/confirmacion' element={ <PublicLayout><ConfirmacionPage /></PublicLayout>} />
+        <Route path="/perfil" element={ <PublicLayout><UserProfilePage /></PublicLayout> } />
       </Routes>
     </BrowserRouter>
   );
