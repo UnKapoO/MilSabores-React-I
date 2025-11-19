@@ -136,7 +136,8 @@
       "precio": 45000,
       "descripcion": "Deliciosa torta de chocolate con capas de ganache y un toque de avellanas. Personalizable con mensajes especiales.",
       "imagen": "img/torta-cuadrada-chocolate-ganache.jpg",
-      "icono": "fa-solid fa-birthday-cake"
+      "icono": "fa-solid fa-birthday-cake",
+      "stock": 5
     },
     {
       "id": "2",
@@ -289,7 +290,7 @@
       "icono": "fa-solid fa-gift"
     },
     {
-      "id": 1763541211568,
+      "id": "bcbf",
       "nombre": "Torta Papucho",
       "descripcion": "Mira que hermoso",
       "historia": "",
@@ -299,8 +300,7 @@
       "precio": 0,
       "descuento": 0,
       "stock": 0,
-      "imagen": "img/706841.jpg",
-      "rating": 5
+      "imagen": ""
     }
   ]
 }

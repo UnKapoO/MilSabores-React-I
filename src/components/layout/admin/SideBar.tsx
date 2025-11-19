@@ -12,7 +12,7 @@ const Sidebar = () => {
   const location = useLocation(); // Para saber en qué página estamos
 
   return (
-    <aside className="w-64 h-screen fixed left-0 top-0 shadow-lg z-50 flex flex-col bg-dark text-white">
+    <aside className="w-64 h-screen fixed left-0 top-0 shadow-lg z-50 flex flex-col bg-letra-cafe text-white">
     
       {/* Logo del Admin */}
       <div className="border-b border-primary/20 flex justify-center items-center">
