@@ -12,12 +12,17 @@ const Sidebar = () => {
   const location = useLocation(); // Para saber en qué página estamos
 
   return (
-    <aside className="w-64 bg-white h-screen fixed left-0 top-0 shadow-lg z-50 flex flex-col">
-      
+    <aside className="w-64 h-screen fixed left-0 top-0 shadow-lg z-50 flex flex-col bg-dark text-white">
+    
       {/* Logo del Admin */}
-      <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-        <img src="/img/logo.jpg" alt="Logo" className="w-10 h-10 rounded-full border-2 border-rose-300" />
-        <span className="font-pacifico text-xl text-gray-700">Mil Sabores</span>
+      <div className="border-b border-primary/20 flex justify-center items-center">
+        <img 
+          src="/img/logoAdminSinFondo.jpg" 
+          alt="Logo" 
+          className="w-30 h-40" 
+        />
+        
+        {/* <span className="font-secundaria text-2xl text-primary">Mil Sabores</span> Antes text-xl */}
       </div>
 
       {/* Menú de Navegación */}
@@ -31,12 +36,12 @@ const Sidebar = () => {
               <li key={link.to}>
                 <Link 
                   to={link.to}
-                  className={`flex items-center gap-3 px-6 py-3 text-gray-600 transition-colors hover:bg-rose-50 hover:text-rose-500 ${
-                    isActive ? 'bg-rose-50 text-rose-500 border-r-4 border-rose-500' : ''
+                  className={`flex items-center gap-3 px-6 py-3 text-gray-300 transition-colors hover:bg-dark/50 hover:text-primary ${
+                    isActive ? 'bg-primary/10 text-primary border-r-4 border-primary' : ''
                   }`}
                 >
                   <i className={`${link.icon} w-5 text-center`}></i>
-                  <span className="font-medium">{link.label}</span>
+                  <span className="font-principal font-medium">{link.label}</span>
                 </Link>
               </li>
             );
@@ -45,13 +50,14 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer del Sidebar (Cerrar Sesión) */}
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-primary/20"> {/* Usamos el borde primario */}
         <Link 
           to="/login" 
-          className="flex items-center gap-3 px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          className="flex items-center gap-3 px-4 py-2 text-red-500 hover:text-primary/90 rounded-lg transition-colors"
+
         >
           <i className="fa-solid fa-right-from-bracket"></i>
-          <span>Cerrar Sesión</span>
+          <span className="font-principal">Cerrar Sesión</span>
         </Link>
       </div>
     </aside>

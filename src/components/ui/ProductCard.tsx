@@ -28,7 +28,7 @@ function ProductCard({ product, onAddToCartClick }: ProductCardProps) {
       onClick={handleViewDetails}
     >
       <img
-        src={`/${product.imagen}`}
+        src={`/${product.imagen}`} 
         alt={product.nombre}
         className="w-full h-48 object-cover"
       />

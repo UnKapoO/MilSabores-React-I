@@ -14,7 +14,9 @@ import AdminLayout from './components/layout/admin/AdminLayout';
 import AdminHomePage from './pages/admin/AdminHomePage';
 // (Componentes temporales para las otras rutas)
 const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
+
 import UserProfilePage from './pages/public/UserProfilePage';
+import AdminCreateProductoPage from './pages/admin/AdminCreateProductoPage';
 
 
 function App() {
@@ -22,6 +24,19 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
+        <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+        <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
+        <Route path="/registro" element={<PublicLayout showFooter={false}><RegisterPage /></PublicLayout>} />
+        <Route
+          path="/catalogo"
+          element={<PublicLayout><CatalogoPage /></PublicLayout>}
+        />
+        <Route path="/producto/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
+        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+        <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
+        <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
+        <Route path='/confirmacion' element={<PublicLayout><ConfirmacionPage /></PublicLayout>} />
+
 
         <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
         <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
@@ -35,7 +50,9 @@ function App() {
         <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
 
 
-        {/* --- Rutas de Admin --- */}
+        {/* --- RUTAS DE ADMIN --- */}
+
+        {/* Home Admin */}
         <Route
           path="/admin"
           element={
@@ -44,19 +61,25 @@ function App() {
             </AdminLayout>
           }
         />
-        
-        <Route path="/" element={ <PublicLayout><HomePage /></PublicLayout> } />
-        <Route path="/login" element={ <PublicLayout showFooter={false}><LoginPage /></PublicLayout> } />
-        <Route path="/registro" element={ <PublicLayout showFooter={false}><RegisterPage /></PublicLayout> } />
-        <Route 
-          path="/catalogo" 
-          element={ <PublicLayout><CatalogoPage /></PublicLayout> } 
+
+        {/* create-producto */}
+        <Route
+          path="/admin/crear-producto"
+          element={<AdminCreateProductoPage />}
         />
-        <Route path="/producto/:id" element={ <PublicLayout><ProductDetailPage /></PublicLayout> } />
-        <Route path="/blog" element={ <PublicLayout><BlogPage /></PublicLayout> } />
-        <Route path="/carrito" element={ <PublicLayout><CarritoPage /></PublicLayout> } />
-        <Route path="/checkout" element={ <PublicLayout><CheckoutPage /></PublicLayout> } />
-        <Route path='/confirmacion' element={ <PublicLayout><ConfirmacionPage /></PublicLayout>} />
+
+        <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+        <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
+        <Route path="/registro" element={<PublicLayout showFooter={false}><RegisterPage /></PublicLayout>} />
+        <Route
+          path="/catalogo"
+          element={<PublicLayout><CatalogoPage /></PublicLayout>}
+        />
+        <Route path="/producto/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
+        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+        <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
+        <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
+        <Route path='/confirmacion' element={<PublicLayout><ConfirmacionPage /></PublicLayout>} />
 
         <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
         <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
@@ -69,7 +92,8 @@ function App() {
         <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
         <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
 
-        <Route path="/perfil" element={ <PublicLayout><UserProfilePage /></PublicLayout> } />
+        <Route path="/perfil" element={<PublicLayout><UserProfilePage /></PublicLayout>} />
+
       </Routes>
     </BrowserRouter>
   );
