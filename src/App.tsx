@@ -8,8 +8,12 @@ import ScrollToTop from './utils/ScrollToTop';
 import CarritoPage from './pages/public/CarritoPage';
 import CheckoutPage from './pages/public/CheckoutPage';
 import ConfirmacionPage from './pages/public/ConfirmacionPage';
-import LoginPage from './pages/public/LoginPage';
+//import LoginPage from './pages/public/LoginPage';
 import RegisterPage from './pages/public/RegisterPage';
+import AdminLayout from './components/layout/admin/AdminLayout';
+import AdminHomePage from './pages/admin/AdminHomePage';
+// (Componentes temporales para las otras rutas)
+const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
 
 function App() {
   return (
@@ -28,6 +32,18 @@ function App() {
         <Route path="/carrito" element={ <PublicLayout><CarritoPage /></PublicLayout> } />
         <Route path="/checkout" element={ <PublicLayout><CheckoutPage /></PublicLayout> } />
         <Route path='/confirmacion' element={ <PublicLayout><ConfirmacionPage /></PublicLayout>} />
+        <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+        <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
+        <Route
+          path="/catalogo"
+          element={<PublicLayout><CatalogoPage /></PublicLayout>}
+        />
+        <Route path="/producto/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
+        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+        <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
+        <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
+
+
       </Routes>
     </BrowserRouter>
   );
