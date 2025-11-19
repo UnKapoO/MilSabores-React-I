@@ -6,6 +6,7 @@ import type { Product } from '../../types/Product';
 import { FeatureCard } from '../../components/ui/FeatureCard';
 import { CategoryCard } from '../../components/ui/CategoryCard';
 import BlogCard from '../../components/ui/BlogCard';
+import { useCart } from '../../context/CartContext';
 interface BlogPost {
   id: number;
   categoria: string,
@@ -18,6 +19,7 @@ interface BlogPost {
 }
 
 function HomePage() {
+  const { addToCart } = useCart();
   const features = [
     { icon: "fa-solid fa-shield-halved", title: "Garantía de frescura", subtitle: "100% productos frescos del día" },
     { icon: "fa-solid fa-gift", title: "Personalización", subtitle: "Diseños únicos para ocasiones" },
@@ -87,9 +89,9 @@ function HomePage() {
           className="container mx-auto px-4 flex flex-col justify-center items-center"
           style={{ minHeight: 'calc(100vh - 7rem)' }}
         >
-          {/* 3. Tu contenido (usamos tus fuentes de Tailwind) */}
-          <h1 className="text-7xl font-secundaria">Mil Sabores</h1>
-          <p className="text-2xl font-principal mt-4">Sabores únicos, momentos inolvidables.</p>
+          {/* 3. Tu contenido  */}
+          <h1 className="text-fondo-crema text-7xl font-secundaria">Mil Sabores</h1>
+          <p className="text-fondo-crema text-2xl font-principal mt-4">Sabores únicos, momentos inolvidables.</p>
           <Link to="/catalogo">
             <button className="bg-acento-rosa text-white py-3 px-8 mt-8 rounded-full 
             font-bold uppercase tracking-wider 
@@ -142,7 +144,11 @@ function HomePage() {
           {/* 4. Hacemos .map() sobre el ESTADO (featuredProducts) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard 
+              key={product.id} 
+              product={product}
+              onAddToCartClick={() => addToCart(product, 1)}
+              />
             ))}
           </div>
         </section>
