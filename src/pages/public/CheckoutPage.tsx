@@ -8,6 +8,7 @@ import { InputField } from '../../components/ui/common/InputField';
 import { SelectField } from '../../components/ui/common/SelectField';
 import type { SelectOption } from '../../components/ui/common/SelectField';
 import { OrderSummary } from '../../components/ui/OrderSummary';
+import { useAuth } from '../../context/AuthContext';
 
 const breadcrumbLinks = [{ to: "/", label: "Inicio" }, { to: "/carrito", label: "Carrito" }];
 
@@ -35,6 +36,7 @@ const getLocalDateString = (date: Date) => {
 };
 
 function CheckoutPage() {
+    const { user } = useAuth();
     const navigate = useNavigate();
     // NOTA: Ya no sacamos 'clearCart' de aquí
     const { cart, addToast } = useCart();
@@ -76,29 +78,41 @@ function CheckoutPage() {
 
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
+        const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+        const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-        if (!formData.nombre.trim()) newErrors.nombre = "El nombre es obligatorio";
-        if (!formData.telefono.trim()) newErrors.telefono = "El teléfono es obligatorio";
-        else if (formData.telefono.length < 8) newErrors.telefono = "Mínimo 8 números";
-        if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email inválido";
-        if (!formData.calle.trim()) newErrors.calle = "La calle es obligatoria";
-        if (!formData.numero.trim()) newErrors.numero = "El número es obligatorio";
-        if (!formData.comuna) newErrors.comuna = "Debes seleccionar una comuna";
+        // Nombre
+        if (!formData.nombre.trim()) newErrors.nombre = "Obligatorio";
+        else if (!soloLetrasRegex.test(formData.nombre)) newErrors.nombre = "Solo letras";
 
-        // Validación de Fecha Estricta (Comparando Strings ISO)
+        // Teléfono: Exactamente 9 dígitos (formato chileno móvil usual)
+        if (!formData.telefono.trim()) newErrors.telefono = "Obligatorio";
+        else if (formData.telefono.length !== 9) newErrors.telefono = "Debe tener 9 dígitos";
+
+        // Email
+        if (!formData.email.trim()) newErrors.email = "Obligatorio";
+        else if (!regexEmail.test(formData.email)) newErrors.email = "Email inválido";
+
+        // Dirección y Número (Límites lógicos)
+        if (!formData.calle.trim()) newErrors.calle = "Obligatorio";
+        else if (formData.calle.length > 50) newErrors.calle = "Máx 50 caracteres";
+
+        if (!formData.numero.trim()) newErrors.numero = "Obligatorio";
+        else if (formData.numero.length > 10) newErrors.numero = "Máx 10 carac.";
+
+        if (!formData.comuna) newErrors.comuna = "Selecciona una comuna";
+
+        // Fecha (Ya la tenías bien, la mantenemos)
         if (!formData.fechaEntrega) {
             newErrors.fechaEntrega = "Selecciona una fecha";
         } else {
-            if (formData.fechaEntrega < minDate) {
-                newErrors.fechaEntrega = "La fecha no puede ser anterior a hoy";
-            } else if (formData.fechaEntrega > maxDate) {
-                newErrors.fechaEntrega = "Máximo 1 mes de anticipación";
-            }
+            if (formData.fechaEntrega < minDate) newErrors.fechaEntrega = "Fecha inválida (pasado)";
+            else if (formData.fechaEntrega > maxDate) newErrors.fechaEntrega = "Máx 1 mes de anticipación";
         }
 
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) {
-            addToast("Por favor corrige los campos en rojo", "error");
+            addToast("Corrige los errores para continuar", "error");
         }
         return Object.keys(newErrors).length === 0;
     };
@@ -111,10 +125,10 @@ function CheckoutPage() {
 
         const orden = {
             cliente: { ...formData, direccion: direccionCompleta },
-            userId: "guest",
             pago: { metodo: metodoPago },
             items: cart, // Pasamos el carrito actual
             total: total,
+            userId: user ? user.email : "guest",
             fechaCreacion: new Date().toISOString()
         };
 
@@ -142,13 +156,12 @@ function CheckoutPage() {
                                 <InputField label="Teléfono *" name="telefono" type="tel" maxLength={9} value={formData.telefono} onChange={handleChange} error={errors.telefono} />
                             </div>
                             <InputField label="Correo electrónico *" name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} />
-
                             <div className="grid grid-cols-12 gap-4">
                                 <div className="col-span-8">
-                                    <InputField label="Calle *" name="calle" type="text" value={formData.calle} onChange={handleChange} error={errors.calle} />
+                                    <InputField label="Calle *" name="calle" type="text" maxLength={50} value={formData.calle} onChange={handleChange} error={errors.calle} />
                                 </div>
                                 <div className="col-span-4">
-                                    <InputField label="Número *" name="numero" type="text" value={formData.numero} onChange={handleChange} error={errors.numero} />
+                                    <InputField label="Número *" name="numero" type="text" maxLength= {15} value={formData.numero} onChange={handleChange} error={errors.numero} />
                                 </div>
                             </div>
 

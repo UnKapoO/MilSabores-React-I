@@ -30,45 +30,41 @@ function RegisterPage() {
         // Limpiar error al escribir para mejorar UX
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
-
-    // --- LÓGICA DE VALIDACIÓN (Replicando tu JS) ---
+    // --- LÓGICA DE VALIDACIÓN ESTRICTA ---
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
 
-        // 1. Validar Nombre
+        // 1. Nombre: Solo letras y espacios, máx 30 caracteres
         const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
         if (!formData.nombre.trim()) {
-            newErrors.nombre = "El nombre no puede estar vacío.";
+            newErrors.nombre = "El nombre es obligatorio.";
         } else if (!soloLetrasRegex.test(formData.nombre)) {
-            newErrors.nombre = "El nombre solo puede contener letras y espacios.";
+            newErrors.nombre = "El nombre solo puede contener letras.";
         } else if (formData.nombre.length > 30) {
-            newErrors.nombre = "El nombre es demasiado largo.";
+            newErrors.nombre = "El nombre es demasiado largo (máx 30).";
         }
 
-        // 2. Validar Correo
+        // 2. Email: Formato estricto
         const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         if (!formData.email.trim()) {
             newErrors.email = "El correo es obligatorio.";
         } else if (!regexEmail.test(formData.email)) {
-            newErrors.email = "Ingrese un correo válido.";
+            newErrors.email = "Ingrese un correo válido (ej: nombre@dominio.com).";
         }
 
-        // 3. Validar Contraseña
-        if (!formData.password.trim()) {
+        // 3. Password: Mínimo 6 caracteres
+        if (!formData.password) {
             newErrors.password = "La contraseña es obligatoria.";
         } else if (formData.password.length < 6) {
-            newErrors.password = "La contraseña debe contener al menos 6 caracteres.";
+            newErrors.password = "Mínimo 6 caracteres.";
         }
 
-        // 4. Validar Confirmación
-        if (!formData.repass.trim()) {
-            newErrors.repass = "Debes confirmar tu contraseña.";
-        } else if (formData.password !== formData.repass) {
-            newErrors.repass = "Las contraseñas no coinciden ⛔";
+        // 4. Confirmación
+        if (formData.password !== formData.repass) {
+            newErrors.confirmPassword = "Las contraseñas no coinciden.";
         }
 
         setErrors(newErrors);
-        // Retorna true si NO hay errores (objeto vacío)
         return Object.keys(newErrors).length === 0;
     };
 
@@ -161,6 +157,7 @@ function RegisterPage() {
                     <InputField
                         label="Nombre Completo"
                         name="nombre"
+                        maxLength={40}
                         type="text"
                         placeholder="Wacoldo Soto"
                         value={formData.nombre}
@@ -202,6 +199,7 @@ function RegisterPage() {
                     <InputField
                         label="Código de Descuento (Opcional)"
                         name="cupon"
+                        maxLength={20}
                         type="text"
                         placeholder="Ej: FELICES50"
                         value={formData.cupon}
@@ -210,7 +208,7 @@ function RegisterPage() {
 
                     <Button
                         type="submit"
-                        className="w-full mt-4 bg-acento-rosa hover:bg-acento-rosa text-white" 
+                        className="w-full mt-4 bg-acento-rosa hover:bg-acento-rosa text-white"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Registrando...' : 'Registrar'}
