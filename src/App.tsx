@@ -15,6 +15,8 @@ import AdminHomePage from './pages/admin/AdminHomePage';
 // (Componentes temporales para las otras rutas)
 const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
 
+import UserProfilePage from './pages/public/UserProfilePage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -32,6 +34,7 @@ function App() {
         <Route path="/carrito" element={ <PublicLayout><CarritoPage /></PublicLayout> } />
         <Route path="/checkout" element={ <PublicLayout><CheckoutPage /></PublicLayout> } />
         <Route path='/confirmacion' element={ <PublicLayout><ConfirmacionPage /></PublicLayout>} />
+
         <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
         <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
         <Route
@@ -42,6 +45,8 @@ function App() {
         <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
         <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
         <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
+
+
 
 
       </Routes>

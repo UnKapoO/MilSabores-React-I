@@ -10,7 +10,6 @@ interface PublicLayoutProps {
 
 function PublicLayout({ children, showFooter = true }: PublicLayoutProps) {
   return (
-    // Este <div> es CRÍTICO para la solución
     <div className="public-layout-container">
       <Header />
       <NotificationToast />
