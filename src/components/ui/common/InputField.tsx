@@ -14,6 +14,8 @@ interface InputFieldProps {
     className?: string; // Para clases extra (opcional)
     min?: string; 
     max?: string;
+    error?: string;
+    maxLength?: number;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -25,7 +27,9 @@ export const InputField: React.FC<InputFieldProps> = ({
     onChange,
     className = '',
     min,
-    max
+    max,
+    error,
+    maxLength
 }) => {
     return (
         // 1. Reemplazamos el <div class="form-group">
@@ -50,11 +54,12 @@ export const InputField: React.FC<InputFieldProps> = ({
                 onChange={onChange}
                 min={min}
                 max={max}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md 
-                focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-                text-letra-cafe"
-            />
-            {/* (Más adelante podríamos agregar un <small> para mensajes de error) */}
+                maxLength={maxLength}
+                className={`w-full px-4 py-2 border border-gray-300 rounded-md 
+                focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-letra-cafe
+                ${error ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-primary"}`}
+                />
+                {error && <small className='text-red-500 text-sm mt-1'>{error}</small>}
         </div>
     );
 };
