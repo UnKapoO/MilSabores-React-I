@@ -12,11 +12,13 @@ import ConfirmacionPage from './pages/public/ConfirmacionPage';
 import RegisterPage from './pages/public/RegisterPage';
 import AdminLayout from './components/layout/admin/AdminLayout';
 import AdminHomePage from './pages/admin/AdminHomePage';
+
 // (Componentes temporales para las otras rutas)
 const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
 
 import UserProfilePage from './pages/public/UserProfilePage';
 import AdminCreateProductoPage from './pages/admin/AdminCreateProductoPage';
+import AdminGestionProductosPage from './pages/admin/AdminGestionProductosPage';
 
 
 function App() {
@@ -62,9 +64,21 @@ function App() {
           }
         />
 
-        {/* create-producto */}
+        {/* Productos */}
+        <Route
+          path="/admin/productos"
+          element={<AdminGestionProductosPage />}
+        />
+
+        {/* Crear productos */}
         <Route
           path="/admin/crear-producto"
+          element={<AdminCreateProductoPage />}
+        />
+
+        {/* Editar productos */}
+        <Route
+          path="/admin/editar/:id"
           element={<AdminCreateProductoPage />}
         />
 

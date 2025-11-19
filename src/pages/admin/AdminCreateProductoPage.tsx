@@ -1,16 +1,12 @@
-// src/pages/admin/AdminCreateProductoPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
+import { useParams } from 'react-router-dom'; 
 import AdminLayout from '../../components/layout/admin/AdminLayout';
-
-// --- Importamos los componentes de la compañera ---
 import { InputField } from '../../components/ui/common/InputField';
 import { SelectField, type SelectOption } from '../../components/ui/common/SelectField';
 import { Button } from '../../components/ui/common/Button';
-
-// --- Importamos nuestros componentes de Admin y el Uploader ---
 import FormPanel from '../../components/ui/admin/FormPanel';
 import AdminPageHeader from '../../components/ui/admin/AdminPageHeader';
-import ImageUploader from '../../components/ui/admin/ImageUploader'; // <-- ¡NUEVO!
+import ImageUploader from '../../components/ui/admin/ImageUploader';
 
 // La URL de tu API (json-server)
 const API_URL = 'http://localhost:3001/productos';
@@ -44,17 +40,55 @@ const initialFormState = {
   precio: 0,
   descuento: 0,
   stock: 0,
-  imagenFile: null as File | null, // ESTADO PARA EL ARCHIVO
+  imagenFile: null as File | null, // Para el objeto File
+  imagenUrl: '', // Para la URL existente en modo edición
 };
 
+// Definimos el tipo de datos del estado
 type FormDataType = typeof initialFormState;
 
 
 const AdminCreateProductoPage = () => {
+  const params = useParams(); // { id: '5' } o {}
+  const productId = params.id; // Puede ser '5' o undefined
+
   const [formData, setFormData] = useState<FormDataType>(initialFormState);
-  
-  // 1. NUEVO ESTADO: Contador para forzar el reseteo visual
+  // El loading solo es necesario en modo edición
+  const [isLoading, setIsLoading] = useState(!!productId); 
+  // Contador para forzar el reseteo visual de ImageUploader
   const [imageResetKey, setImageResetKey] = useState(0); 
+
+  
+
+  // --- LÓGICA DE CARGA DE DATOS (Para modo Edición) ---
+  useEffect(() => {
+    if (!productId) return; // Si no hay ID, salimos (Modo Creación)
+
+    const fetchProductForEdit = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${API_URL}/${productId}`);
+        if (!response.ok) throw new Error('Producto no encontrado para edición');
+        
+        const data = await response.json();
+
+        // Mapeamos los datos de la API al estado de nuestro formulario
+        setFormData({
+          ...data,
+          // Guardamos la URL existente, si la hay
+          imagenUrl: data.imagen || '',
+          // El archivo a subir es nulo por defecto (solo se usa al cambiar)
+          imagenFile: null, 
+        });
+      } catch (error) {
+        console.error("Error al cargar producto para edición:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProductForEdit();
+  }, [productId]); // Se dispara cuando la URL de edición cambia
 
   // Función genérica para manejar el cambio en Input/Select
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -68,72 +102,72 @@ const AdminCreateProductoPage = () => {
     }));
   };
 
-  // Función específica para manejar el cambio de la Imagen (ImageUploader)
+  // Función para manejar la selección de Imagen
   const handleImageSelect = (file: File | null) => {
     setFormData(prevData => ({
       ...prevData,
-      imagenFile: file, 
+      imagenFile: file, // Guardamos el objeto File o null
     }));
   };
   
-  // Función que se ejecuta al presionar Guardar (Conexión a la API)
+  // --- LÓGICA DE ENVÍO (POST o PATCH) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validación de imagen
-    if (!formData.imagenFile) {
-        alert("Debes seleccionar una imagen para el producto.");
-        return;
-    }
-    
-    const newProductData = {
-        // ... (otros campos)
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
-        historia: formData.historia,
-        codigo: formData.codigo,
-        categoria: formData.categoria,
-        estado: formData.estado,
-        precio: formData.precio,
-        descuento: formData.descuento,
-        stock: formData.stock,
-        
-        // Simulación de la URL de la imagen
-        imagen: `img/${formData.imagenFile.name}`, 
-        
-        rating: 5,
-        id: Date.now(), 
+    // 1. Prepara los datos (remueve imagenFile y usa la URL correcta)
+    const dataToSend = { 
+        ...formData, 
+        // Si hay una imagen nueva, usa el nombre del archivo. Si no, usa la URL antigua.
+        imagen: formData.imagenFile ? `img/${formData.imagenFile.name}` : formData.imagenUrl,
+        // Eliminamos las props de control del estado
+        imagenFile: undefined,
+        imagenUrl: undefined,
     };
+    
+    // Determina el método y la URL
+    const method = productId ? 'PATCH' : 'POST'; 
+    const url = productId ? `${API_URL}/${productId}` : API_URL;
 
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST', 
+        const response = await fetch(url, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newProductData), 
+            body: JSON.stringify(dataToSend), 
         });
 
-        if (!response.ok) {
-            throw new Error(`Error al guardar: Código ${response.status}`);
-        }
-
-        const result = await response.json();
+        if (!response.ok) throw new Error(`Error ${method} en la API: Código ${response.status}`);
         
-        // 2. Éxito: Limpiamos el formulario y forzamos el reinicio de la imagen
-        alert(`🎉 Producto "${result.nombre}" guardado con ID: ${result.id} en el Catálogo (db.json).`);
-        setFormData(initialFormState);      
-        setImageResetKey(prev => prev + 1); // <-- ¡LA CLAVE PARA EL RESET VISUAL!
+        // Muestra el mensaje de éxito
+        const successMessage = productId ? 'actualizado' : 'creado';
+        alert(`🎉 Producto ${successMessage} con éxito!`);
+        
+        // Limpia el formulario y reinicia la clave
+        setFormData(initialFormState);
+        setImageResetKey(prev => prev + 1);
 
     } catch (error) {
-        console.error("Fallo al guardar el producto:", error);
-        alert(`🔴 Ocurrió un error al intentar guardar el producto. Asegúrate que 'npm run server' esté activo.`);
+        alert(`🔴 Error al guardar. Asegúrate que 'npm run server' esté activo.`);
+        console.error("Fallo al guardar:", error);
     }
   };
+
+  // ----------------------------------------------------
+  // LÓGICA DE RENDERIZADO
+  // ----------------------------------------------------
+  
+  // Título y texto dinámico para el modo Creación/Edición
+  const pageTitle = productId ? 'Editar Producto' : 'Nuevo Producto';
+  const buttonText = productId ? 'Guardar Cambios' : 'Guardar Producto';
+
+  if (isLoading) {
+      return <AdminLayout><div className="p-20 text-center text-primary">Cargando producto...</div></AdminLayout>;
+  }
 
   return (
     <AdminLayout>
       <AdminPageHeader
-        title="Nuevo Producto"
-        subtitle="Rellena la información para añadir un item al catálogo."
+        title={pageTitle}
+        subtitle="Administra los detalles y precios del catálogo."
       />
 
       <form onSubmit={handleSubmit}>
@@ -143,7 +177,6 @@ const AdminCreateProductoPage = () => {
           <div className="lg:col-span-2 space-y-6">
             
             <FormPanel title="Información Principal del Producto">
-              {/* Nombre, Descripción, Historia */}
               <InputField
                 label="Nombre del Producto" type="text" name="nombre" placeholder="Ej: Torta de Chocolate Intenso"
                 value={formData.nombre} onChange={handleChange as any} />
@@ -192,10 +225,11 @@ const AdminCreateProductoPage = () => {
             </FormPanel>
 
             <FormPanel title="Imagen del Producto">
-              {/* 3. ¡USAMOS LA LLAVE! Esto fuerza la destrucción y creación del componente al resetear. */}
               <ImageUploader 
                 key={imageResetKey} 
-                onImageSelect={handleImageSelect} 
+                onImageSelect={handleImageSelect}
+                // Si existe una URL, la pasamos para la previsualización inicial
+                initialPreviewUrl={formData.imagenUrl ? `/${formData.imagenUrl}` : undefined}
               />
             </FormPanel>
 
@@ -206,7 +240,7 @@ const AdminCreateProductoPage = () => {
         <div className="mt-8 text-right">
           <Button type="submit" variant="primary">
             <i className="fa-solid fa-save mr-2"></i>
-            Guardar Producto
+            {buttonText} {/* Texto dinámico */}
           </Button>
         </div>
       </form>
