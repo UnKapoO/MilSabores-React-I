@@ -3,7 +3,7 @@ import React from 'react';
 // --- Definimos las Propiedades (Props) que recibirá ---
 interface InputFieldProps {
     label: string; // El texto que va arriba (ej: "Correo electrónico")
-    type: 'text' | 'email' | 'password' | 'number' | 'date' | 'tel'; // Tipos de input que aceptará
+    type: 'text' | 'email' | 'password' | 'number' | 'date' | 'tel' | 'month'; // Tipos de input que aceptará
     placeholder?: string; // El texto de ejemplo (opcional)
     name: string; // El 'name' del input, importante para los formularios
 

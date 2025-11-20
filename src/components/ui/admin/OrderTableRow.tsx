@@ -7,7 +7,7 @@ import { Button } from '../common/Button';
 interface OrderTableRowProps {
   order: Order;
   onViewDetails: (id: number | string) => void;
-  
+
   // 🚨 CORRECCIÓN: Añadimos la definición de esta prop
   // La hacemos opcional (?) por si acaso no la pasas siempre
   onUpdateStatus?: (id: number | string, newStatus: Order['estado']) => void;
@@ -37,7 +37,7 @@ const renderStatusBadge = (status: Order['estado']) => {
 const OrderTableRow: React.FC<OrderTableRowProps> = ({ order, onViewDetails, onUpdateStatus }) => {
   return (
     <tr className="hover:bg-rose-50 transition-colors">
-      
+
       {/* Columna 1: ID */}
       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-primary">
         #{order.id}
@@ -67,30 +67,21 @@ const OrderTableRow: React.FC<OrderTableRowProps> = ({ order, onViewDetails, onU
       <td className="px-6 py-4 whitespace-nowrap">
         {renderStatusBadge(order.estado)}
       </td>
-
       {/* Columna 7: Acciones */}
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <div className="flex justify-end items-center gap-2">
-            <Button 
-                onClick={() => onViewDetails(order.id)} 
-                variant="outline" 
-                className="text-primary border-primary/50 hover:bg-primary hover:text-white"
-                title="Ver detalles"
-            >
-                <i className="fa-solid fa-eye"></i>
-            </Button>
-            
-            {/* (Opcional) Botón para avanzar estado, usando la nueva prop */}
-            {onUpdateStatus && order.estado === 'pendiente' && (
-                <Button 
-                    onClick={() => onUpdateStatus(order.id, 'en-preparacion')}
-                    variant="outline"
-                    className="text-blue-500 border-blue-200 hover:bg-blue-50"
-                    title="Pasar a Preparación"
-                >
-                    <i className="fa-solid fa-arrow-right"></i>
-                </Button>
-            )}
+        {/* Usamos justify-end para alinear a la derecha */}
+        <div className="flex justify-end items-center">
+          {/* SOLO DEJAMOS ESTE BOTÓN */}
+          <Button
+            onClick={() => onViewDetails(order.id)}
+            variant="outline"
+            className="text-primary border-primary/50 hover:bg-primary hover:text-white"
+            title="Ver detalles del pedido"
+          >
+            <i className="fa-solid fa-eye"></i>
+          </Button>
+
+          {/* ELIMINAMOS CUALQUIER OTRO BOTÓN AQUÍ (Como el de Editar o Eliminar) */}
         </div>
       </td>
     </tr>

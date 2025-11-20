@@ -14,87 +14,94 @@ import CheckoutPage from './pages/public/CheckoutPage';
 import ConfirmacionPage from './pages/public/ConfirmacionPage';
 import UserProfilePage from './pages/public/UserProfilePage';
 import RegisterPage from './pages/public/RegisterPage';
+import LoginPage from './pages/public/LoginPage'; // 1. IMPORTAMOS LA PÁGINA REAL
 
 // Páginas Admin
 import AdminHomePage from './pages/admin/AdminHomePage';
 import AdminGestionProductosPage from './pages/admin/AdminGestionProductosPage';
 import AdminCreateProductoPage from './pages/admin/AdminCreateProductoPage';
-import AdminGestionPedidosPage from './pages/admin/AdminGestionPedidosPage'; // <-- Asegúrate de importar esto
+import AdminGestionPedidosPage from './pages/admin/AdminGestionPedidosPage'; 
 
-// Utils
+// Utils y Contextos
 import ScrollToTop from './utils/ScrollToTop';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext'; // 2. IMPORTAMOS CARTPROVIDER (Necesario para las notificaciones del login)
+import NotificationToast from './components/ui/common/NotificationToast'; // 3. IMPORTAMOS EL TOAST
 
-// Componentes Temporales
-const LoginPage = () => <h1 style={{ padding: '2rem', height: '100vh' }}>Página de Login</h1>;
-const AdminGestionClientesPage = () => <h1 className="p-8 text-2xl">Gestión de Clientes (Próximamente)</h1>; // Placeholder
+// Componente Temporal (Solo queda el de clientes)
+const AdminGestionClientesPage = () => <h1 className="p-8 text-2xl">Gestión de Clientes (Próximamente)</h1>;
 
 
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
-      
-      <Routes>
-        
-        {/* =========================================
-            BLOQUE 1: RUTAS PÚBLICAS
-           ========================================= */}
+      <AuthProvider>
+        {/* 4. ENVUELVE CON CARTPROVIDER: El Login usa 'addToast' de aquí */}
+        <CartProvider>
+          
+          <NotificationToast /> {/* Para ver los mensajes de error/éxito */}
+          <ScrollToTop />
 
-        <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
-        <Route path="/catalogo" element={<PublicLayout><CatalogoPage /></PublicLayout>} />
-        <Route path="/producto/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
-        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
-        <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
-        <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
-        <Route path="/confirmacion" element={<PublicLayout><ConfirmacionPage /></PublicLayout>} />
-        <Route path="/perfil" element={<PublicLayout><UserProfilePage /></PublicLayout>} />
+          <Routes>
 
-        {/* Rutas de Autenticación (sin Footer) */}
-        <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
-        <Route path="/registro" element={<PublicLayout showFooter={false}><RegisterPage /></PublicLayout>} />
+            {/* =========================================
+              BLOQUE 1: RUTAS PÚBLICAS
+             ========================================= */}
+
+            <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+            <Route path="/catalogo" element={<PublicLayout><CatalogoPage /></PublicLayout>} />
+            <Route path="/producto/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
+            <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+            <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
+            <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
+            <Route path="/confirmacion" element={<PublicLayout><ConfirmacionPage /></PublicLayout>} />
+            <Route path="/perfil" element={<PublicLayout><UserProfilePage /></PublicLayout>} />
+
+            {/* Rutas de Autenticación */}
+            {/* Ahora usa el componente real importado arriba */}
+            <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
+            <Route path="/registro" element={<PublicLayout showFooter={false}><RegisterPage /></PublicLayout>} />
 
 
-        {/* =========================================
-            BLOQUE 2: RUTAS DE ADMINISTRACIÓN
-           ========================================= */}
-        
-        {/* Dashboard */}
-        <Route 
-          path="/admin" 
-          element={ <AdminLayout><AdminHomePage /></AdminLayout> } 
-        />
+            {/* =========================================
+              BLOQUE 2: RUTAS DE ADMINISTRACIÓN
+             ========================================= */}
 
-        {/* Gestión de Productos */}
-        <Route 
-          path="/admin/productos" 
-          element={ <AdminGestionProductosPage /> } // El layout ya está dentro de la página
-        />
-        <Route 
-          path="/admin/crear-producto" 
-          element={ <AdminCreateProductoPage /> } 
-        />
-        <Route 
-          path="/admin/editar/:id" 
-          element={ <AdminCreateProductoPage /> } 
-        />
+            <Route
+              path="/admin"
+              element={<AdminLayout><AdminHomePage /></AdminLayout>}
+            />
 
-        {/* Gestión de Pedidos */}
-        <Route 
-          path="/admin/pedidos" 
-          element={ <AdminGestionPedidosPage /> } 
-        />
+            <Route
+              path="/admin/productos"
+              element={<AdminGestionProductosPage />} 
+            />
+            <Route
+              path="/admin/crear-producto"
+              element={<AdminCreateProductoPage />}
+            />
+            <Route
+              path="/admin/editar/:id"
+              element={<AdminCreateProductoPage />}
+            />
 
-        {/* Gestión de Clientes */}
-        <Route 
-          path="/admin/clientes" 
-          element={ 
-            <AdminLayout>
-              <AdminGestionClientesPage />
-            </AdminLayout> 
-          } 
-        />
+            <Route
+              path="/admin/pedidos"
+              element={<AdminGestionPedidosPage />}
+            />
 
-      </Routes>
+            <Route
+              path="/admin/clientes"
+              element={
+                <AdminLayout>
+                  <AdminGestionClientesPage />
+                </AdminLayout>
+              }
+            />
+
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

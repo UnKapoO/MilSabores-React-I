@@ -23,34 +23,164 @@
       ],
       "cuponUsado": "FELICES50",
       "fechaRegistro": "2025-11-19T04:26:52.244Z"
+    },
+    {
+      "id": "f175",
+      "nombre": "Juan",
+      "email": "juan@gmail.com",
+      "password": "123456",
+      "rol": "cliente",
+      "beneficios": [],
+      "cuponUsado": null,
+      "fechaRegistro": "2025-11-20T02:34:14.613Z"
+    },
+    {
+      "id": "7dc8",
+      "nombre": "Pedro",
+      "email": "pe@gmail.com",
+      "password": "123456",
+      "rol": "cliente",
+      "beneficios": [],
+      "cuponUsado": null,
+      "fechaRegistro": "2025-11-20T13:59:41.402Z"
     }
   ],
   "pedidos": [
     {
       "id": "ORD-001",
       "userId": "wacoldo@gmail.com",
-      "fecha": "2024-03-10T10:00:00.000Z",
+      "fecha": "2025-01-15T14:30:00.000Z",
       "total": 45500,
       "estado": "entregado",
       "items": [
         {
-          "nombre": "Torta de Chocolate",
+          "nombre": "Torta Cuadrada de Chocolate",
           "cantidad": 1,
-          "precio": 45500
+          "precio": 45500,
+          "imagen": "img/torta-cuadrada-chocolate-ganache.jpg"
         }
       ]
     },
     {
       "id": "ORD-002",
-      "userId": "wacoldo@gmail.com",
-      "fecha": "2024-03-10T10:00:00.000Z",
-      "total": 22000,
-      "estado": "procesando",
+      "userId": "cliente_feliz@gmail.com",
+      "fecha": "2025-02-20T10:00:00.000Z",
+      "total": 1000,
+      "estado": "en-preparacion",
       "items": [
         {
-          "nombre": "Torta de Vainilla",
+          "nombre": "Torta Circular de Vainilla",
           "cantidad": 1,
-          "precio": 22000
+          "precio": 1000,
+          "imagen": "img/torta-circular-vainilla.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ORD-003",
+      "userId": "juan.perez@empresa.cl",
+      "fecha": "2025-11-18T09:15:00.000Z",
+      "total": 5000,
+      "estado": "pendiente",
+      "items": [
+        {
+          "nombre": "Mousse de Chocolate",
+          "cantidad": 1,
+          "precio": 5000,
+          "imagen": "img/mousse-chocolate-cremoso-individual.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ORD-004",
+      "userId": "maria.gonzalez@gmail.com",
+      "fecha": "2025-11-19T18:45:00.000Z",
+      "total": 110000,
+      "estado": "pendiente",
+      "items": [
+        {
+          "nombre": "Torta Especial de Boda",
+          "cantidad": 1,
+          "precio": 60000,
+          "imagen": "img/torta-boda-especial.jpg"
+        },
+        {
+          "nombre": "Torta Cuadrada de Frutas",
+          "cantidad": 1,
+          "precio": 50000,
+          "imagen": "img/torta-cuadrada-frutas-crema-chantilly.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ORD-005",
+      "userId": "carlos.vegan@outlook.com",
+      "fecha": "2025-10-05T12:00:00.000Z",
+      "total": 54500,
+      "estado": "entregado",
+      "items": [
+        {
+          "nombre": "Torta Vegana de Chocolate",
+          "cantidad": 1,
+          "precio": 50000,
+          "imagen": "img/torta-vegana-chocolate-sin-productos-animales.jpg"
+        },
+        {
+          "nombre": "Galletas Veganas de Avena",
+          "cantidad": 1,
+          "precio": 4500,
+          "imagen": "img/galletas-veganas-avena-crujientes.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ORD-006",
+      "userId": "susana.eventos@gmail.com",
+      "fecha": "2025-09-12T16:20:00.000Z",
+      "total": 55000,
+      "estado": "cancelado",
+      "items": [
+        {
+          "nombre": "Torta Especial de Cumpleaños",
+          "cantidad": 1,
+          "precio": 55000,
+          "imagen": "img/torta-cumplea-os-especial-decorada-personalizada.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ORD-007",
+      "userId": "roberto.fit@gym.cl",
+      "fecha": "2025-11-20T08:30:00.000Z",
+      "total": 96000,
+      "estado": "en-preparacion",
+      "items": [
+        {
+          "nombre": "Torta Sin Azúcar de Naranja",
+          "cantidad": 1,
+          "precio": 48000,
+          "imagen": "img/torta-naranja-sin-azucar-saludable.jpg"
+        },
+        {
+          "nombre": "Cheesecake Sin Azúcar",
+          "cantidad": 1,
+          "precio": 48000,
+          "imagen": "img/cheesecake.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ORD-008",
+      "userId": "abuela.carmen@familia.cl",
+      "fecha": "2024-12-24T19:00:00.000Z",
+      "total": 42000,
+      "estado": "entregado",
+      "items": [
+        {
+          "nombre": "Torta Circular de Manjar",
+          "cantidad": 1,
+          "precio": 42000,
+          "imagen": "img/torta-circular-manjar.jpg"
         }
       ]
     }
