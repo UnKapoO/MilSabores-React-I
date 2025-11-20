@@ -7,9 +7,9 @@ interface ButtonProps {
     type?: 'button' | 'submit' | 'reset';
     variant?: 'primary' | 'secondary' | 'outline';
     className?: string;
-
     // 1. ¡NUEVA PROP!
     disabled?: boolean;
+    title?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -18,7 +18,8 @@ export const Button: React.FC<ButtonProps> = ({
     type = 'button',
     variant = 'primary',
     className = '',
-    disabled = false // 2. Valor por defecto
+    disabled = false, // 2. Valor por defecto
+    title,
 }) => {
 
     // --- Estilos Base ---
@@ -46,6 +47,7 @@ export const Button: React.FC<ButtonProps> = ({
             type={type}
             onClick={onClick}
             disabled={disabled} // 4. Pasamos la prop al HTML real
+            title={title}
             className={`${baseStyle} ${variantStyle} ${className}`}
         >
             {children}
