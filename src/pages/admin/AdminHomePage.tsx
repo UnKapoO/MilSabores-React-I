@@ -1,41 +1,46 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 
+// Componentes UI
 import AdminPageHeader from '../../components/ui/admin/AdminPageHeader';
 import KpiCard from '../../components/ui/admin/KpiCard';
 import { Button } from '../../components/ui/common/Button';
 import MonthlyIncomeWidget from '../../components/ui/admin/MonthlyIncomeWidget'; 
 import { InputField } from '../../components/ui/common/InputField';
 
+// Tipos y Contexto
 import type { Product } from '../../types/Product';
 import type { Order } from '../../types/Order';
 import { formatearPrecio, obtenerNombreCategoria } from '../../utils/formatters';
+import { useAuth } from '../../context/AuthContext'; // Para el nombre del usuario
 
 const API_URL = 'http://localhost:3001';
 
 const AdminHomePage = () => {
     const navigate = useNavigate();
+    const { user } = useAuth(); // Obtenemos el usuario para el saludo
     
     // --- ESTADOS ---
-    // 1. ACTUALIZAMOS EL ESTADO DE STATS para los nuevos KPIs
+    // 1. KPIs Específicos (Diarios + Visitas)
     const [stats, setStats] = useState({ 
-        dailySales: 0,      // Ventas del Día
-        dailyOrders: 0,     // Pedidos Nuevos (Hoy)
+        dailySales: 0,      // Ventas de HOY
+        dailyOrders: 0,     // Cantidad de pedidos de HOY
         siteVisits: 0,      // Visitas (Simulado)
-        activeProducts: 0   // Productos Activos
+        activeProducts: 0   // Total productos
     });
 
-    const [monthlyIncome, setMonthlyIncome] = useState(0);
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
     const [topProducts, setTopProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [allOrders, setAllOrders] = useState<Order[]>([]);
 
+    // Estado para el selector de Mes (para el widget de ingresos)
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const now = new Date();
-        return now.toISOString().slice(0, 7); 
+        return now.toISOString().slice(0, 7); // "YYYY-MM"
     });
 
+    // Estado para la Meta Mensual (Persistente)
     const [monthlyGoal, setMonthlyGoal] = useState(() => {
         const savedGoal = localStorage.getItem('admin_monthly_goal');
         return savedGoal ? parseInt(savedGoal) : 2000000;
@@ -54,12 +59,13 @@ const AdminHomePage = () => {
                 const productsData: Product[] = await productsRes.json();
                 const ordersData = await ordersRes.json();
 
+                // Procesamos los pedidos (Normalización)
                 const processedOrders: Order[] = ordersData.map((item: any) => ({
                     id: item.id,
                     cliente: item.userId || item.cliente || 'Cliente',
-                    // Formateamos la fecha para compararla fácilmente (DD/MM/AAAA)
+                    // Formateamos la fecha para compararla (DD/MM/AAAA)
                     fecha: new Date(item.fecha).toLocaleDateString('es-CL'),
-                    originalDate: item.fecha, 
+                    originalDate: item.fecha, // ISO string
                     total: item.total,
                     itemsCount: item.items ? item.items.length : 0,
                     estado: item.estado === 'procesando' ? 'en-preparacion' : item.estado
@@ -67,47 +73,25 @@ const AdminHomePage = () => {
 
                 setAllOrders(processedOrders);
 
-                // --- 2. CÁLCULO DE LOS NUEVOS KPIs ---
-                
-                // A. Obtener la fecha de HOY en formato string (ej: "20/11/2025")
-                // Nota: Depende de tu zona horaria local
-                const todayString = new Date().toLocaleDateString('es-CL');
+                // --- 2. CÁLCULO DE KPIs DIARIOS ---
+                const todayString = new Date().toLocaleDateString('es-CL'); // Fecha de hoy local
 
-                // B. Filtrar pedidos que tengan la fecha de HOY
+                // Filtramos solo los pedidos que coincidan con la fecha de hoy
                 const ordersToday = processedOrders.filter(o => o.fecha === todayString);
 
-                // C. Ventas del Día (Suma de totales de hoy, excluyendo cancelados)
+                // Suma de ventas de hoy (excluyendo cancelados)
                 const salesToday = ordersToday
                     .filter(o => o.estado !== 'cancelado')
                     .reduce((sum, o) => sum + o.total, 0);
 
-                // D. Pedidos Nuevos (Cantidad de pedidos de hoy)
-                const newOrdersCount = ordersToday.length;
-
                 setStats({
                     dailySales: salesToday,
-                    dailyOrders: newOrdersCount,
-                    siteVisits: 145, // Dato Simulado (fijo o random)
-                    activeProducts: productsData.length, // Total de productos
+                    dailyOrders: ordersToday.length,
+                    siteVisits: 145, // Dato Simulado
+                    activeProducts: productsData.length,
                 });
 
-                // ... (Resto de lógica igual) ...
-                const now = new Date();
-                const currentMonth = now.getMonth(); 
-                const currentYear = now.getFullYear();
-
-                const ventasDelMes = processedOrders
-                    .filter(order => {
-                        const orderDate = new Date((order as any).originalDate || order.fecha);
-                        return (
-                            orderDate.getMonth() === currentMonth &&
-                            orderDate.getFullYear() === currentYear &&
-                            order.estado !== 'cancelado'
-                        );
-                    })
-                    .reduce((sum, order) => sum + order.total, 0);
-
-                setMonthlyIncome(ventasDelMes);
+                // Listas para las tablas
                 setRecentOrders([...processedOrders].reverse().slice(0, 5));
                 setTopProducts(productsData.slice(0, 4));
 
@@ -121,17 +105,19 @@ const AdminHomePage = () => {
         fetchData();
     }, []);
 
-    // ... (Resto de handlers y useMemo se mantienen igual) ...
-    
+    // --- 3. CÁLCULO DE INGRESOS MENSUALES (Widget) ---
     const monthlyIncomeFiltered = useMemo(() => {
         return allOrders
             .filter(order => {
                 const orderDateISO = (order as any).originalDate || '';
+                // Filtramos por el mes seleccionado en el input type="month"
                 return orderDateISO.startsWith(selectedMonth) && order.estado !== 'cancelado';
             })
             .reduce((sum, order) => sum + order.total, 0);
     }, [allOrders, selectedMonth]);
 
+
+    // --- HANDLERS ---
     const handleEditGoal = () => {
         const newGoalString = window.prompt("Ingresa la nueva meta mensual:", monthlyGoal.toString());
         if (newGoalString !== null) {
@@ -159,23 +145,26 @@ const AdminHomePage = () => {
         }
     };
 
+    // Nombre para el saludo
+    const firstName = user?.nombre ? user.nombre.split(' ')[0] : 'Administrador';
+
     if (isLoading) return <div className="p-20 text-center text-primary">Cargando panel...</div>;
 
     return (
         <>
             <AdminPageHeader
-                title="Dashboard"
-                subtitle="Resumen general de tu pastelería."
+                title={`¡Bienvenido de nuevo, ${firstName}!`}
+                subtitle="Aquí tienes el resumen de tu pastelería."
             />
 
-            {/* --- 3. NUEVOS KPIs RENDERIZADOS --- */}
+            {/* --- SECCIÓN 1: KPIs DIARIOS --- */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 
                 {/* Ventas del Día */}
                 <KpiCard 
                     title="Ventas del Día" 
                     value={formatearPrecio(stats.dailySales)} 
-                    icon="fa-solid fa-cash-register" // Icono de caja registradora
+                    icon="fa-solid fa-cash-register" 
                     colorClass="text-green-600" 
                 />
                 
@@ -183,29 +172,28 @@ const AdminHomePage = () => {
                 <KpiCard 
                     title="Pedidos Nuevos" 
                     value={stats.dailyOrders} 
-                    icon="fa-solid fa-bell" // Icono de notificación/campana
+                    icon="fa-solid fa-bell" 
                     colorClass="text-amber-500" 
                 />
                 
-                {/* Visitas (Simulado) */}
+                {/* Visitas */}
                 <KpiCard 
                     title="Visitas al Sitio" 
                     value={stats.siteVisits} 
-                    icon="fa-solid fa-eye" // Icono de ojo
+                    icon="fa-solid fa-eye" 
                     colorClass="text-blue-500" 
                 />
                 
-                {/* Productos Activos (Mantenido) */}
+                {/* Productos */}
                 <KpiCard 
                     title="Productos Activos" 
                     value={stats.activeProducts} 
-                    icon="fa-solid fa-box-open" // Icono de caja abierta
+                    icon="fa-solid fa-box-open" 
                     colorClass="text-rose-500" 
                 />
-                
             </section>
 
-            {/* Widget de Meta Mensual */}
+            {/* --- SECCIÓN 2: Widget de Meta Mensual --- */}
             <div className="mb-8">
                 <div className="flex justify-between items-end mb-4">
                     <h3 className="text-lg font-bold text-gray-700">Rendimiento Mensual</h3>
@@ -220,7 +208,6 @@ const AdminHomePage = () => {
                         />
                     </div>
                 </div>
-                {/* Usamos el valor calculado con useMemo para que el filtro funcione */}
                 <MonthlyIncomeWidget 
                     currentAmount={monthlyIncomeFiltered} 
                     goalAmount={monthlyGoal} 
@@ -228,6 +215,7 @@ const AdminHomePage = () => {
                 />
             </div>
 
+            {/* --- SECCIÓN 3: Tablas --- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 {/* Últimos Pedidos */}
@@ -238,7 +226,6 @@ const AdminHomePage = () => {
                             Ver Todos
                         </Button>
                     </div>
-                    
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-100">
                             <thead className="bg-white">

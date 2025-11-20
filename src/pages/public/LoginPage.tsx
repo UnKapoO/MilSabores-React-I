@@ -1,65 +1,74 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext'; // Para usar addToast
+import { useNavigate, Link } from 'react-router-dom';
 
-// Importamos los LEGOs
-import { AuthCard } from '../../components/ui/AuthCard';
+// 1. Hooks de Contexto
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext'; // Usamos useCart para el 'addToast'
+
+// 2. Componentes de UI (LEGOs)
+import { AuthCard } from '../../components/ui/AuthCard'; // Asegúrate de tener este componente
 import { InputField } from '../../components/ui/common/InputField';
 import { Button } from '../../components/ui/common/Button';
 
+// 3. Tipos
+import type { User } from '../../types/User';
+
 function LoginPage() {
     const navigate = useNavigate();
-    const { login } = useAuth(); // Saca la función 'login' del cerebro
-    const { addToast } = useCart(); // Usamos el sistema de toasts que ya hicimos
+    const { login } = useAuth(); 
+    const { addToast } = useCart(); // Usamos la notificación del carrito (la versión revertida)
 
+    // Estados del formulario
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- FUNCIÓN DE LOGIN ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            // 1. Buscamos el usuario en json-server
-            // (Json-server permite buscar por email así: ?email=...)
-            const response = await fetch(`http://localhost:3001/usuarios?email=${email}`);
-            const users = await response.json();
+            // 4. Petición a la API (Búsqueda exacta de usuario y contraseña)
+            // json-server devuelve un array con las coincidencias
+            const response = await fetch(`http://localhost:3001/usuarios?email=${email}&password=${password}`);
+            
+            if (!response.ok) throw new Error('Error en la conexión con el servidor');
+            
+            const users: User[] = await response.json();
 
-            if (users.length === 0) {
-                addToast('Error: El usuario no está registrado', 'error');
-                setIsLoading(false);
-                return;
+            if (users.length > 0) {
+                // --- CASO ÉXITO ---
+                const userFound = users[0];
+                
+                // A. Guardamos la sesión
+                login(userFound);
+                
+                // B. Notificamos
+                addToast(`¡Bienvenido de nuevo, ${userFound.nombre || 'Usuario'}!`, 'success');
+
+                // C. Redirigimos según el rol
+                if (userFound.rol === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/catalogo'); // O '/' si prefieres
+                }
+
+            } else {
+                // --- CASO ERROR (Credenciales inválidas) ---
+                addToast('Correo electrónico o contraseña incorrectos.', 'error');
             }
-
-            const user = users[0];
-
-            // 2. Verificamos la contraseña (¡OJO! En frontend esto es inseguro, pero para la tarea sirve)
-            if (user.password !== password) {
-                addToast('Error: La contraseña es incorrecta', 'error');
-                setIsLoading(false);
-                return;
-            }
-
-            // 3. Login Exitoso
-            login(user); // Guardamos en el contexto
-            addToast(`¡Bienvenido ${user.nombre || 'Usuario'}!`, 'success');
-
-            // 4. Redirigimos al Home o Catálogo
-            navigate('/catalogo');
 
         } catch (error) {
             console.error("Error de login:", error);
-            addToast('Error de conexión con el servidor', 'error');
+            addToast('Ocurrió un error al intentar iniciar sesión.', 'error');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="container mx-auto py-12 px-4 flex justify-center">
+        <div className="container mx-auto py-12 px-4 flex justify-center items-center min-h-[80vh]">
+            {/* Usamos el AuthCard para mantener el estilo consistente */}
             <AuthCard
                 title="Iniciar Sesión"
                 subtitle="Bienvenido de vuelta a Mil Sabores"
@@ -67,7 +76,8 @@ function LoginPage() {
                 footerLinkText="Crear cuenta nueva"
                 footerLinkTo="/registro"
             >
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    
                     <InputField
                         label="Correo electrónico"
                         name="email"
@@ -82,11 +92,10 @@ function LoginPage() {
                             label="Contraseña"
                             name="password"
                             type="password"
-                            placeholder="Tu contraseña"
+                            placeholder="Ingresa tu contraseña"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                        {/* (Podríamos agregar botón de "ver contraseña" aquí si quisieras) */}
                     </div>
 
                     <div className="flex justify-between items-center text-sm">
@@ -94,15 +103,23 @@ function LoginPage() {
                             <input type="checkbox" className="rounded text-primary focus:ring-primary" />
                             Recordarme
                         </label>
-                        <a href="#" className="text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+                        <a href="#" className="text-primary font-bold hover:underline">
+                            ¿Olvidaste tu contraseña?
+                        </a>
                     </div>
 
                     <Button
                         type="submit"
-                        className="w-full mt-2"
-                        disabled={isLoading} // Deshabilita si está cargando
+                        className="w-full mt-4"
+                        disabled={isLoading}
                     >
-                        {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
+                        {isLoading ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <i className="fa-solid fa-spinner fa-spin"></i> Cargando...
+                            </span>
+                        ) : (
+                            'Iniciar Sesión'
+                        )}
                     </Button>
 
                 </form>
