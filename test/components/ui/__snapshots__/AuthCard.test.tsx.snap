@@ -1,0 +1,218 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Componente: AuthCard (Snapshot) > Debe mantener su estructura visual (Snapshot) 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mx-auto"
+      >
+        <div
+          class="p-8 pb-0 text-center"
+        >
+          <h1
+            class="font-secundaria text-4xl text-dark mb-2"
+          >
+            Título de Prueba
+          </h1>
+          <p
+            class="text-letra-cafe"
+          >
+            Subtítulo de prueba
+          </p>
+        </div>
+        <div
+          class="p-8"
+        >
+          <form>
+            <input
+              placeholder="Input de prueba"
+              type="text"
+            />
+          </form>
+        </div>
+        <div
+          class="bg-gray-50 px-8 py-4 text-center text-sm text-letra-cafe border-t border-gray-200"
+        >
+          <p>
+            Texto pie
+             
+            <a
+              class="text-primary font-bold hover:underline"
+              data-discover="true"
+              href="/test"
+            >
+              Link pie
+            </a>
+          </p>
+        </div>
+        <div
+          class="bg-amber-50 px-8 py-4 border-t border-amber-100"
+        >
+          <h4
+            class="text-acento-cafe font-bold mb-2 flex items-center gap-2 text-sm"
+          >
+            <i
+              class="fa-solid fa-gift"
+            />
+             Ofertas especiales
+          </h4>
+          <ul
+            class="text-xs text-letra-cafe space-y-1 list-disc list-inside"
+          >
+            <li>
+              <strong>
+                Mayores de 50 años:
+              </strong>
+               50% de descuento
+            </li>
+            <li>
+              <strong>
+                Código "FELICES50":
+              </strong>
+               10% descuento de por vida
+            </li>
+            <li>
+              <strong>
+                Estudiantes Duoc:
+              </strong>
+               Torta gratis en cumpleaños
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mx-auto"
+    >
+      <div
+        class="p-8 pb-0 text-center"
+      >
+        <h1
+          class="font-secundaria text-4xl text-dark mb-2"
+        >
+          Título de Prueba
+        </h1>
+        <p
+          class="text-letra-cafe"
+        >
+          Subtítulo de prueba
+        </p>
+      </div>
+      <div
+        class="p-8"
+      >
+        <form>
+          <input
+            placeholder="Input de prueba"
+            type="text"
+          />
+        </form>
+      </div>
+      <div
+        class="bg-gray-50 px-8 py-4 text-center text-sm text-letra-cafe border-t border-gray-200"
+      >
+        <p>
+          Texto pie
+           
+          <a
+            class="text-primary font-bold hover:underline"
+            data-discover="true"
+            href="/test"
+          >
+            Link pie
+          </a>
+        </p>
+      </div>
+      <div
+        class="bg-amber-50 px-8 py-4 border-t border-amber-100"
+      >
+        <h4
+          class="text-acento-cafe font-bold mb-2 flex items-center gap-2 text-sm"
+        >
+          <i
+            class="fa-solid fa-gift"
+          />
+           Ofertas especiales
+        </h4>
+        <ul
+          class="text-xs text-letra-cafe space-y-1 list-disc list-inside"
+        >
+          <li>
+            <strong>
+              Mayores de 50 años:
+            </strong>
+             50% de descuento
+          </li>
+          <li>
+            <strong>
+              Código "FELICES50":
+            </strong>
+             10% descuento de por vida
+          </li>
+          <li>
+            <strong>
+              Estudiantes Duoc:
+            </strong>
+             Torta gratis en cumpleaños
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1763607454920" clover="3.2.0">
+  <project timestamp="1763607454921" name="All files">
+    <metrics statements="42" coveredstatements="42" conditionals="30" coveredconditionals="25" methods="17" coveredmethods="16" elements="89" coveredelements="83" complexity="0" loc="42" ncloc="42" packages="3" files="9" classes="9"/>
+    <package name="components.ui">
+      <metrics statements="16" coveredstatements="16" conditionals="5" coveredconditionals="3" methods="9" coveredmethods="9"/>
+      <file name="AuthCard.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\AuthCard.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="13" count="1" type="stmt"/>
+      </file>
+      <file name="CartItem.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\CartItem.tsx">
+        <metrics statements="8" coveredstatements="8" conditionals="2" coveredconditionals="2" methods="4" coveredmethods="4"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="23" count="4" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="27" count="4" type="stmt"/>
+        <line num="28" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="88" count="1" type="stmt"/>
+      </file>
+      <file name="OrderSummary.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\OrderSummary.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="3" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="23" count="1" type="stmt"/>
+      </file>
+      <file name="ProductCard.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\ProductCard.tsx">
+        <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="12" count="3" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="20" count="3" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.ui.common">
+      <metrics statements="13" coveredstatements="13" conditionals="13" coveredconditionals="10" methods="4" coveredmethods="3"/>
+      <file name="Breadcrumb.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\common\Breadcrumb.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="18" count="1" type="stmt"/>
+      </file>
+      <file name="Button.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\common\Button.tsx">
+        <metrics statements="10" coveredstatements="10" conditionals="7" coveredconditionals="7" methods="1" coveredmethods="1"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="28" count="6" type="stmt"/>
+        <line num="31" count="6" type="stmt"/>
+        <line num="32" count="6" type="cond" truecount="3" falsecount="0"/>
+        <line num="34" count="4" type="stmt"/>
+        <line num="35" count="4" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
+      </file>
+      <file name="InputField.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\common\InputField.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="3" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="21" count="1" type="stmt"/>
+      </file>
+      <file name="SelectField.tsx" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\components\ui\common\SelectField.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="3" coveredconditionals="3" methods="1" coveredmethods="1"/>
+        <line num="24" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="utils">
+      <metrics statements="13" coveredstatements="13" conditionals="12" coveredconditionals="12" methods="4" coveredmethods="4"/>
+      <file name="formatters.ts" path="C:\Fullstack II\PASTELERIA_ACTU\MilSabores-React-I\src\utils\formatters.ts">
+        <metrics statements="13" coveredstatements="13" conditionals="12" coveredconditionals="12" methods="4" coveredmethods="4"/>
+        <line num="4" count="19" type="stmt"/>
+        <line num="12" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="25" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="3" type="stmt"/>
+        <line num="35" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="37" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="41" count="3" type="stmt"/>
+        <line num="45" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="48" count="3" type="stmt"/>
+        <line num="54" count="3" type="cond" truecount="2" falsecount="0"/>
+      </file>
+    </package>
+  </project>
+</coverage>

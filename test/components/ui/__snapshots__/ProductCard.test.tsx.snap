@@ -1,0 +1,120 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Componente: ProductCard (Snapshot) > Debe coincidir con el diseño establecido (Snapshot) 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="bg-white h-full flex flex-col border border-gray-200 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+      >
+        <img
+          alt="Super Torta"
+          class="w-full h-48 object-cover"
+          src="/img/torta.jpg"
+        />
+        <div
+          class="p-4 flex flex-col flex-grow"
+        >
+          <h3
+            class="text-lg font-bold text-dark mb-2"
+          >
+            Super Torta
+          </h3>
+          <p
+            class="text-xl font-bold text-primary mb-4 flex-grow"
+          >
+            $10.000
+          </p>
+          <button
+            class="w-full bg-acento-rosa text-letra-cafe font-bold py-2 px-4 rounded-full hover:bg-acento-cafe hover:text-white transition-colors mt-auto"
+          >
+            Agregar al Carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="bg-white h-full flex flex-col border border-gray-200 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+    >
+      <img
+        alt="Super Torta"
+        class="w-full h-48 object-cover"
+        src="/img/torta.jpg"
+      />
+      <div
+        class="p-4 flex flex-col flex-grow"
+      >
+        <h3
+          class="text-lg font-bold text-dark mb-2"
+        >
+          Super Torta
+        </h3>
+        <p
+          class="text-xl font-bold text-primary mb-4 flex-grow"
+        >
+          $10.000
+        </p>
+        <button
+          class="w-full bg-acento-rosa text-letra-cafe font-bold py-2 px-4 rounded-full hover:bg-acento-cafe hover:text-white transition-colors mt-auto"
+        >
+          Agregar al Carrito
+        </button>
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
