@@ -31,6 +31,9 @@ export function formatearFecha(fechaISO: string): string {
         month: 'long',
         day: 'numeric',
     };
+    
+    if(!fechaISO) return '';
+
     const fechaAParsear = fechaISO.includes('T') 
     ? fechaISO 
     : fechaISO + 'T00:00:00';
