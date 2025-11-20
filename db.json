@@ -33,11 +33,19 @@
       "beneficios": [],
       "cuponUsado": null,
       "fechaRegistro": "2025-11-20T02:34:14.613Z"
+    },
+    {
+      "id": "7dc8",
+      "nombre": "Pedro",
+      "email": "pe@gmail.com",
+      "password": "123456",
+      "rol": "cliente",
+      "beneficios": [],
+      "cuponUsado": null,
+      "fechaRegistro": "2025-11-20T13:59:41.402Z"
     }
   ],
-
-
-"pedidos": [
+  "pedidos": [
     {
       "id": "ORD-001",
       "userId": "wacoldo@gmail.com",
@@ -57,13 +65,13 @@
       "id": "ORD-002",
       "userId": "cliente_feliz@gmail.com",
       "fecha": "2025-02-20T10:00:00.000Z",
-      "total": 22000,
+      "total": 1000,
       "estado": "en-preparacion",
       "items": [
         {
           "nombre": "Torta Circular de Vainilla",
           "cantidad": 1,
-          "precio": 22000,
+          "precio": 1000,
           "imagen": "img/torta-circular-vainilla.jpg"
         }
       ]
@@ -177,8 +185,6 @@
       ]
     }
   ],
-
-
   "blog": [
     {
       "id": "1",
