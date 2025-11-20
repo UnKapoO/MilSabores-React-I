@@ -290,7 +290,7 @@
       "icono": "fa-solid fa-gift"
     },
     {
-      "id": "bcbf",
+      "id": "9c33",
       "nombre": "Torta Papucho",
       "descripcion": "Mira que hermoso",
       "historia": "",
@@ -299,7 +299,7 @@
       "estado": "activo",
       "precio": 0,
       "descuento": 0,
-      "stock": 0,
+      "stock": 1,
       "imagen": ""
     }
   ]
