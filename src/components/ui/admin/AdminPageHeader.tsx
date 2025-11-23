@@ -8,7 +8,7 @@ interface AdminPageHeaderProps {
 
 const AdminPageHeader = ({ title, subtitle, actionButton }: AdminPageHeaderProps) => {
   return (
-    <header className="mb-8 flex items-center justify-between">
+    <header className="mb-8 mt-6 flex items-center justify-between">
       <div>
         <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
         {subtitle && <p className="text-gray-500 mt-1">{subtitle}</p>}
