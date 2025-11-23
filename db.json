@@ -183,6 +183,35 @@
           "imagen": "img/torta-circular-manjar.jpg"
         }
       ]
+    },
+    {
+      "id": "ORD-1763665050391",
+      "userId": "cliente@gmail.com",
+      "fecha": "2025-11-20T18:57:30.391Z",
+      "total": 48000,
+      "estado": "pendiente",
+      "items": [
+        {
+          "nombre": "Torta Cuadrada de Chocolate",
+          "cantidad": 1,
+          "precio": 45000,
+          "imagen": "img/torta-cuadrada-chocolate-ganache.jpg"
+        }
+      ],
+      "cliente": {
+        "nombre": "hola",
+        "telefono": "124235112",
+        "email": "asda@asd.com",
+        "calle": "123124",
+        "numero": "12312",
+        "tipoVivienda": "casa",
+        "comuna": "concepcion",
+        "fechaEntrega": "2025-11-20",
+        "direccion": "123124 #12312 (casa)"
+      },
+      "pago": {
+        "metodo": "webpay"
+      }
     }
   ],
   "blog": [

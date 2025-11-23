@@ -1,32 +1,31 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 
 // Componentes UI
 import AdminPageHeader from '../../components/ui/admin/AdminPageHeader';
 import KpiCard from '../../components/ui/admin/KpiCard';
-import { Button } from '../../components/ui/common/Button';
-import MonthlyIncomeWidget from '../../components/ui/admin/MonthlyIncomeWidget'; 
-import { InputField } from '../../components/ui/common/InputField';
+import { Button } from '../../components/ui/common/Button'; 
+import MonthlyIncomeWidget from '../../components/ui/admin/MonthlyIncomeWidget';
+import { InputField } from '../../components/ui/common/InputField'; 
 
 // Tipos y Contexto
 import type { Product } from '../../types/Product';
 import type { Order } from '../../types/Order';
 import { formatearPrecio, obtenerNombreCategoria } from '../../utils/formatters';
-import { useAuth } from '../../context/AuthContext'; // Para el nombre del usuario
+import { useAuth } from '../../context/AuthContext';
 
 const API_URL = 'http://localhost:3001';
 
 const AdminHomePage = () => {
     const navigate = useNavigate();
-    const { user } = useAuth(); // Obtenemos el usuario para el saludo
-    
+    const { user } = useAuth();
+
     // --- ESTADOS ---
-    // 1. KPIs Específicos (Diarios + Visitas)
-    const [stats, setStats] = useState({ 
-        dailySales: 0,      // Ventas de HOY
-        dailyOrders: 0,     // Cantidad de pedidos de HOY
-        siteVisits: 0,      // Visitas (Simulado)
-        activeProducts: 0   // Total productos
+    const [stats, setStats] = useState({
+        dailySales: 0,
+        dailyOrders: 0,
+        siteVisits: 145,
+        activeProducts: 0
     });
 
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
@@ -34,13 +33,11 @@ const AdminHomePage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [allOrders, setAllOrders] = useState<Order[]>([]);
 
-    // Estado para el selector de Mes (para el widget de ingresos)
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const now = new Date();
-        return now.toISOString().slice(0, 7); // "YYYY-MM"
+        return now.toISOString().slice(0, 7);
     });
 
-    // Estado para la Meta Mensual (Persistente)
     const [monthlyGoal, setMonthlyGoal] = useState(() => {
         const savedGoal = localStorage.getItem('admin_monthly_goal');
         return savedGoal ? parseInt(savedGoal) : 2000000;
@@ -59,27 +56,40 @@ const AdminHomePage = () => {
                 const productsData: Product[] = await productsRes.json();
                 const ordersData = await ordersRes.json();
 
-                // Procesamos los pedidos (Normalización)
-                const processedOrders: Order[] = ordersData.map((item: any) => ({
-                    id: item.id,
-                    cliente: item.userId || item.cliente || 'Cliente',
-                    // Formateamos la fecha para compararla (DD/MM/AAAA)
-                    fecha: new Date(item.fecha).toLocaleDateString('es-CL'),
-                    originalDate: item.fecha, // ISO string
-                    total: item.total,
-                    itemsCount: item.items ? item.items.length : 0,
-                    estado: item.estado === 'procesando' ? 'en-preparacion' : item.estado
-                }));
+                // --- CORRECCIÓN PRINCIPAL AQUÍ ---
+                // Procesamos los pedidos normalizando los datos viejos y nuevos
+                const processedOrders: Order[] = ordersData.map((item: any) => {
+                    // 1. Arreglo de Fechas: Soporta 'fecha' (viejo) y 'fechaCreacion' (nuevo)
+                    const rawDate = item.fecha || item.fechaCreacion || new Date().toISOString();
+
+                    // 2. Arreglo de Cliente: Soporta objeto completo o string simple
+                    let clientName = 'Cliente Desconocido';
+                    if (item.cliente && typeof item.cliente === 'object' && item.cliente.nombre) {
+                        clientName = item.cliente.nombre;
+                    } else if (typeof item.cliente === 'string') {
+                        clientName = item.cliente;
+                    } else if (item.userId) {
+                        clientName = item.userId;
+                    }
+
+                    return {
+                        id: item.id,
+                        cliente: clientName,
+                        fecha: new Date(rawDate).toLocaleDateString('es-CL'),
+                        originalDate: rawDate,
+                        total: item.total,
+                        itemsCount: item.items ? item.items.length : 0,
+                        estado: item.estado === 'procesando' ? 'en-preparacion' : item.estado
+                    };
+                });
+                // ---------------------------------
 
                 setAllOrders(processedOrders);
 
-                // --- 2. CÁLCULO DE KPIs DIARIOS ---
-                const todayString = new Date().toLocaleDateString('es-CL'); // Fecha de hoy local
-
-                // Filtramos solo los pedidos que coincidan con la fecha de hoy
+                // CÁLCULO DE KPIs DIARIOS
+                const todayString = new Date().toLocaleDateString('es-CL');
                 const ordersToday = processedOrders.filter(o => o.fecha === todayString);
 
-                // Suma de ventas de hoy (excluyendo cancelados)
                 const salesToday = ordersToday
                     .filter(o => o.estado !== 'cancelado')
                     .reduce((sum, o) => sum + o.total, 0);
@@ -87,12 +97,17 @@ const AdminHomePage = () => {
                 setStats({
                     dailySales: salesToday,
                     dailyOrders: ordersToday.length,
-                    siteVisits: 145, // Dato Simulado
+                    siteVisits: 145,
                     activeProducts: productsData.length,
                 });
 
                 // Listas para las tablas
-                setRecentOrders([...processedOrders].reverse().slice(0, 5));
+                // Ordenamos por fecha original para tener los más recientes primero
+                const sortedOrders = [...processedOrders].sort((a: any, b: any) =>
+                    new Date(b.originalDate).getTime() - new Date(a.originalDate).getTime()
+                );
+
+                setRecentOrders(sortedOrders.slice(0, 5));
                 setTopProducts(productsData.slice(0, 4));
 
             } catch (error) {
@@ -105,12 +120,11 @@ const AdminHomePage = () => {
         fetchData();
     }, []);
 
-    // --- 3. CÁLCULO DE INGRESOS MENSUALES (Widget) ---
+    // --- CÁLCULO DE INGRESOS MENSUALES ---
     const monthlyIncomeFiltered = useMemo(() => {
         return allOrders
             .filter(order => {
                 const orderDateISO = (order as any).originalDate || '';
-                // Filtramos por el mes seleccionado en el input type="month"
                 return orderDateISO.startsWith(selectedMonth) && order.estado !== 'cancelado';
             })
             .reduce((sum, order) => sum + order.total, 0);
@@ -145,7 +159,6 @@ const AdminHomePage = () => {
         }
     };
 
-    // Nombre para el saludo
     const firstName = user?.nombre ? user.nombre.split(' ')[0] : 'Administrador';
 
     if (isLoading) return <div className="p-20 text-center text-primary">Cargando panel...</div>;
@@ -157,67 +170,59 @@ const AdminHomePage = () => {
                 subtitle="Aquí tienes el resumen de tu pastelería."
             />
 
-            {/* --- SECCIÓN 1: KPIs DIARIOS --- */}
+            {/* SECCIÓN 1: KPIs DIARIOS */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                
-                {/* Ventas del Día */}
-                <KpiCard 
-                    title="Ventas del Día" 
-                    value={formatearPrecio(stats.dailySales)} 
-                    icon="fa-solid fa-cash-register" 
-                    colorClass="text-green-600" 
+                <KpiCard
+                    title="Ventas del Día"
+                    value={formatearPrecio(stats.dailySales)}
+                    icon="fa-solid fa-cash-register"
+                    colorClass="text-green-600"
                 />
-                
-                {/* Pedidos Nuevos (Hoy) */}
-                <KpiCard 
-                    title="Pedidos Nuevos" 
-                    value={stats.dailyOrders} 
-                    icon="fa-solid fa-bell" 
-                    colorClass="text-amber-500" 
+                <KpiCard
+                    title="Pedidos Nuevos"
+                    value={stats.dailyOrders}
+                    icon="fa-solid fa-bell"
+                    colorClass="text-amber-500"
                 />
-                
-                {/* Visitas */}
-                <KpiCard 
-                    title="Visitas al Sitio" 
-                    value={stats.siteVisits} 
-                    icon="fa-solid fa-eye" 
-                    colorClass="text-blue-500" 
+                <KpiCard
+                    title="Visitas al Sitio"
+                    value={stats.siteVisits}
+                    icon="fa-solid fa-eye"
+                    colorClass="text-blue-500"
                 />
-                
-                {/* Productos */}
-                <KpiCard 
-                    title="Productos Activos" 
-                    value={stats.activeProducts} 
-                    icon="fa-solid fa-box-open" 
-                    colorClass="text-rose-500" 
+                <KpiCard
+                    title="Productos Activos"
+                    value={stats.activeProducts}
+                    icon="fa-solid fa-box-open"
+                    colorClass="text-rose-500"
                 />
             </section>
 
-            {/* --- SECCIÓN 2: Widget de Meta Mensual --- */}
+            {/* SECCIÓN 2: Widget de Meta Mensual */}
             <div className="mb-8">
                 <div className="flex justify-between items-end mb-4">
                     <h3 className="text-lg font-bold text-gray-700">Rendimiento Mensual</h3>
                     <div className="w-48">
-                        <InputField 
-                            label="" 
+                        <InputField
+                            label=""
                             name="monthSelector"
-                            type="month" 
+                            type="month"
                             value={selectedMonth}
                             onChange={handleMonthChange}
-                            className="mb-0" 
+                            className="mb-0"
                         />
                     </div>
                 </div>
-                <MonthlyIncomeWidget 
-                    currentAmount={monthlyIncomeFiltered} 
-                    goalAmount={monthlyGoal} 
+                <MonthlyIncomeWidget
+                    currentAmount={monthlyIncomeFiltered}
+                    goalAmount={monthlyGoal}
                     onEdit={handleEditGoal}
                 />
             </div>
 
-            {/* --- SECCIÓN 3: Tablas --- */}
+            {/* SECCIÓN 3: Tablas */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
+
                 {/* Últimos Pedidos */}
                 <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col">
                     <div className="p-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
@@ -266,11 +271,7 @@ const AdminHomePage = () => {
                         {topProducts.map((product, index) => (
                             <li key={product.id} className="p-4 flex items-center gap-4 hover:bg-rose-50/50 transition-colors">
                                 <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-white">
-                                    {product.imagen ? (
-                                        <img src={`/${product.imagen}`} alt={product.nombre} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400"><i className="fa-solid fa-image"></i></div>
-                                    )}
+                                    <img src={`/${product.imagen}`} alt={product.nombre} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold text-gray-800 truncate" title={product.nombre}>{index + 1}. {product.nombre}</p>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './common/Button';
+// Importamos nuestra función robusta
 import { formatearPrecio, formatearFecha } from '../../utils/formatters';
 
-// Definimos qué datos necesita este componente para dibujarse
 interface OrderSuccessCardProps {
     orden: {
         cliente: {
@@ -16,12 +16,11 @@ interface OrderSuccessCardProps {
         items: any[];
         total: number;
         fechaCreacion: string;
-        // Podríamos añadir el ID de la orden aquí si el backend lo devolviera
     };
 }
 
 export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => {
-    // Generamos un número de pedido falso basado en la fecha para simular
+    // Generamos un número de pedido falso basado en la fecha
     const numeroPedido = `MS-${Date.now().toString().slice(-6)}`;
 
     return (
@@ -48,10 +47,13 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                     <div className="text-right">
                         <span className="text-sm text-letra-gris block">Fecha del pedido:</span>
                         <span className="font-bold text-dark">
-                            {new Date(orden.fechaCreacion).toLocaleDateString('es-CL')}
+                            {/* --- 1. CORREGIDO: Usamos formatearFecha --- */}
+                            {formatearFecha(orden.fechaCreacion)}
                         </span>
                     </div>
                 </div>
+
+                {/* Lista de Productos */}
                 <div className="p-8 border-b border-gray-200">
                     <h3 className="font-bold text-lg text-dark mb-4">
                         <i className="fa-solid fa-basket-shopping text-primary mr-2"></i>
@@ -66,7 +68,6 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                                         <p className="font-bold text-dark">
                                             {item.nombre} <span className="text-sm font-normal text-letra-gris">x{item.cantidad}</span>
                                         </p>
-                                        {/* Aquí mostramos la personalización si existe */}
                                         {(item.cantidadPersonas || item.mensajeEspecial || item.colorGlaseado) && (
                                             <div className="text-xs text-letra-cafe mt-1 space-y-0.5">
                                                 {item.cantidadPersonas && <p>Tamaño: {item.cantidadPersonas}</p>}
@@ -85,6 +86,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                 </div>
 
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
                     {/* Columna Info Entrega */}
                     <div>
                         <h3 className="font-bold text-lg text-dark mb-4 border-b pb-2">
@@ -102,6 +104,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                             </li>
                             <li>
                                 <span className="font-bold block text-xs text-letra-gris uppercase">Fecha Estimada:</span>
+                                {/* --- 2. CORREGIDO: Usamos formatearFecha aquí también --- */}
                                 {formatearFecha(orden.cliente.fechaEntrega)}
                             </li>
                         </ul>
@@ -126,7 +129,6 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                             </div>
                         </div>
 
-                        {/* Mensaje de Correo */}
                         <div className="mt-6 bg-blue-50 p-3 rounded-md flex gap-3 items-start text-sm text-blue-800">
                             <i className="fa-solid fa-envelope mt-1"></i>
                             <div>
@@ -137,9 +139,8 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                     </div>
                 </div>
 
-                {/* Footer de la Tarjeta (Botones) */}
+                {/* Footer Botones */}
                 <div className="bg-gray-50 p-6 flex flex-col sm:flex-row justify-center gap-4 border-t border-gray-200">
-                    {/* Botón Simulado de Descarga */}
                     <Button variant="outline" onClick={() => alert("Descargando PDF...")}>
                         <i className="fa-solid fa-file-pdf mr-2"></i>
                         Descargar Boleta
@@ -160,7 +161,6 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                     Volver al Inicio
                 </Link>
             </div>
-
         </div>
     );
 };

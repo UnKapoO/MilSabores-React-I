@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext'; // 1. Importamos AuthContext
 
 import { Breadcrumb } from '../../components/ui/common/Breadcrumb';
 import { PageHeader } from '../../components/ui/common/PageHeader';
 import { InputField } from '../../components/ui/common/InputField';
 import { SelectField } from '../../components/ui/common/SelectField';
-import type { SelectOption } from '../../components/ui/common/SelectField';
+import type { SelectOption } from '../../components/ui/common/SelectField'; // Importación de tipo separada
 import { OrderSummary } from '../../components/ui/OrderSummary';
-import { useAuth } from '../../context/AuthContext';
 
 const breadcrumbLinks = [{ to: "/", label: "Inicio" }, { to: "/carrito", label: "Carrito" }];
 
@@ -28,7 +28,6 @@ const viviendaOptions: SelectOption[] = [
 ];
 
 // --- LÓGICA DE FECHAS (LOCAL) ---
-// Función para obtener fecha local en formato YYYY-MM-DD
 const getLocalDateString = (date: Date) => {
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - (offset * 60 * 1000));
@@ -36,20 +35,20 @@ const getLocalDateString = (date: Date) => {
 };
 
 function CheckoutPage() {
-    const { user } = useAuth();
     const navigate = useNavigate();
-    // NOTA: Ya no sacamos 'clearCart' de aquí
+    // 2. Sacamos el usuario del AuthContext
+    const { user } = useAuth();
+    // Nota: NO sacamos 'clearCart' aquí para evitar el bug del congelamiento
     const { cart, addToast } = useCart();
 
-    // Cálculo de fechas DENTRO del componente para que siempre sea "Hoy" real
+    // Cálculo de fechas
     const today = new Date();
-    const minDate = getLocalDateString(today); // Hoy local
-
+    const minDate = getLocalDateString(today);
     const maxDateObj = new Date();
-    maxDateObj.setMonth(maxDateObj.getMonth() + 1); // Hoy + 1 mes
+    maxDateObj.setMonth(maxDateObj.getMonth() + 1);
     const maxDate = getLocalDateString(maxDateObj);
 
-
+    // Protección: Si el carrito está vacío, volver al catálogo
     useEffect(() => {
         if (cart.length === 0) {
             navigate('/catalogo');
@@ -81,28 +80,19 @@ function CheckoutPage() {
         const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
         const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-        // Nombre
         if (!formData.nombre.trim()) newErrors.nombre = "Obligatorio";
         else if (!soloLetrasRegex.test(formData.nombre)) newErrors.nombre = "Solo letras";
 
-        // Teléfono: Exactamente 9 dígitos (formato chileno móvil usual)
         if (!formData.telefono.trim()) newErrors.telefono = "Obligatorio";
-        else if (formData.telefono.length !== 9) newErrors.telefono = "Debe tener 9 dígitos";
+        else if (formData.telefono.length < 8) newErrors.telefono = "Mínimo 8 números";
 
-        // Email
         if (!formData.email.trim()) newErrors.email = "Obligatorio";
         else if (!regexEmail.test(formData.email)) newErrors.email = "Email inválido";
 
-        // Dirección y Número (Límites lógicos)
         if (!formData.calle.trim()) newErrors.calle = "Obligatorio";
-        else if (formData.calle.length > 50) newErrors.calle = "Máx 50 caracteres";
-
         if (!formData.numero.trim()) newErrors.numero = "Obligatorio";
-        else if (formData.numero.length > 10) newErrors.numero = "Máx 10 carac.";
-
         if (!formData.comuna) newErrors.comuna = "Selecciona una comuna";
 
-        // Fecha (Ya la tenías bien, la mantenemos)
         if (!formData.fechaEntrega) {
             newErrors.fechaEntrega = "Selecciona una fecha";
         } else {
@@ -117,25 +107,66 @@ function CheckoutPage() {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // 3. EL NUEVO HANDLER DE ENVÍO (ASYNC Y POST)
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validate()) return;
 
         const direccionCompleta = `${formData.calle} #${formData.numero} (${formData.tipoVivienda})`;
 
-        const orden = {
-            cliente: { ...formData, direccion: direccionCompleta },
-            pago: { metodo: metodoPago },
-            items: cart, // Pasamos el carrito actual
-            total: total,
+        // Construimos el objeto de la orden
+        const newOrder = {
+            // Usamos el email del usuario logueado, o "guest"
             userId: user ? user.email : "guest",
-            fechaCreacion: new Date().toISOString()
+
+            // Generamos un ID temporal (aunque json-server genera uno, esto es útil para mostrarlo inmediatamente)
+            id: `ORD-${Date.now()}`,
+
+            fecha: new Date().toISOString(),
+            total: total,
+            estado: "pendiente",
+            // Mapeamos los items para guardar solo lo importante
+            items: cart.map(item => ({
+                nombre: item.nombre,
+                cantidad: item.cantidad,
+                precio: item.precio,
+                imagen: item.imagen,
+                // Guardamos personalización si existe
+                cantidadPersonas: item.cantidadPersonas,
+                mensajeEspecial: item.mensajeEspecial,
+                colorGlaseado: item.colorGlaseado
+            })),
+            cliente: {
+                ...formData,
+                direccion: direccionCompleta
+            },
+            pago: { metodo: metodoPago }
         };
 
-        // --- ARREGLO DEL CONGELAMIENTO ---
-        // 1. NO llamamos a clearCart() aquí.
-        // 2. Navegamos primero. La página de confirmación limpiará el carro.
-        navigate('/confirmacion', { state: { orden } });
+        try {
+            // 4. HACEMOS EL POST A LA BASE DE DATOS
+            const response = await fetch('http://localhost:3001/pedidos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newOrder)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al guardar el pedido');
+            }
+
+            // Recuperamos la orden guardada (con el ID real si json-server lo cambió)
+            const savedOrder = await response.json();
+
+            // 5. NAVEGAMOS A CONFIRMACIÓN (Sin limpiar carrito aquí)
+            navigate('/confirmacion', { state: { orden: savedOrder } });
+
+        } catch (error) {
+            console.error("Error al procesar el pedido:", error);
+            addToast("Hubo un problema al procesar tu pedido. Inténtalo nuevamente.", "error");
+        }
     };
 
     return (
@@ -147,21 +178,22 @@ function CheckoutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
                     <div className="lg:col-span-2 space-y-8">
                         {/* Sección Entrega */}
-                        <section className="bg-white p-6 rounded-lg shadow-md border">
+                        <section className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                             <h3 className="text-2xl font-bold text-dark mb-4 flex items-center gap-2">
                                 <i className="fa-solid fa-truck text-primary"></i> Información de Entrega
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <InputField label="Nombre completo *" name="nombre" type="text" value={formData.nombre} onChange={handleChange} error={errors.nombre} />
-                                <InputField label="Teléfono *" name="telefono" type="tel" maxLength={9} value={formData.telefono} onChange={handleChange} error={errors.telefono} />
+                                <InputField label="Teléfono *" name="telefono" type="tel" maxLength={9} placeholder="Ej: 912345678" value={formData.telefono} onChange={handleChange} error={errors.telefono} />
                             </div>
                             <InputField label="Correo electrónico *" name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} />
+
                             <div className="grid grid-cols-12 gap-4">
                                 <div className="col-span-8">
                                     <InputField label="Calle *" name="calle" type="text" maxLength={50} value={formData.calle} onChange={handleChange} error={errors.calle} />
                                 </div>
                                 <div className="col-span-4">
-                                    <InputField label="Número *" name="numero" type="text" maxLength= {15} value={formData.numero} onChange={handleChange} error={errors.numero} />
+                                    <InputField label="Número *" name="numero" type="text" maxLength={10} value={formData.numero} onChange={handleChange} error={errors.numero} />
                                 </div>
                             </div>
 
@@ -174,19 +206,17 @@ function CheckoutPage() {
                                 <InputField
                                     label="Fecha de entrega *" name="fechaEntrega" type="date"
                                     value={formData.fechaEntrega} onChange={handleChange}
-                                    // Pasamos los límites calculados dinámicamente
                                     min={minDate} max={maxDate}
                                     error={errors.fechaEntrega}
                                 />
                                 <small className="text-gray-500 -mt-3 block">
-                                    {/* Mostramos la fecha máxima legible */}
                                     Puedes agendar hasta el {maxDateObj.toLocaleDateString('es-CL')}.
                                 </small>
                             </div>
                         </section>
 
                         {/* Sección Pago */}
-                        <section className="bg-white p-6 rounded-lg shadow-md border">
+                        <section className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                             <h3 className="text-2xl font-bold text-dark mb-4 flex items-center gap-2">
                                 <i className="fa-solid fa-credit-card text-primary"></i> Método de Pago
                             </h3>
