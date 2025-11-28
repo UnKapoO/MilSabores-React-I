@@ -1,20 +1,52 @@
-import React from 'react';
-import Sidebar from '../admin/SideBar'; // Asegúrate que la ruta sea correcta
+// src/components/layout/admin/AdminLayout.tsx
+import React, { useState } from 'react';
+import Sidebar from './SideBar';
+import MenuToggle from '../../ui/admin/MenuToggle';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-const AdminLayout = ({ children }: AdminLayoutProps) => {
-  return (
-    <div className="min-h-screen bg-fondo-crema">
-      <Sidebar />
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+  // Estado para controlar si el menú está abierto o cerrado
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-      {/* 'ml-64' deja el margen izquierdo del tamaño de la sidebar */}
-      <main className="ml-64 p-8 transition-all duration-300">
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
+  
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+  
+  return (
+    <div className="min-h-screen bg-fondo-crema relative">
+      
+      {/* 1. Botón de Hamburguesa (Solo visible en móvil) */}
+      <MenuToggle isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+
+      {/* 2. Sidebar (Pasa el estado y la función de cerrar) */}
+      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+
+      {/* 3. Overlay Oscuro (Solo en móvil) */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
+          onClick={closeSidebar} 
+        />
+      )}
+
+      {/* 4. Contenido Principal */}
+      {/* 🚨 CORRECCIÓN: Eliminamos 'w-full' de aquí.
+          'lg:ml-64': Deja el espacio para el sidebar fijo.
+          Al ser un elemento de bloque, llenará el resto del espacio automáticamente.
+      */}
+      <main className="lg:ml-64 p-8 transition-all duration-300">
         
-        {/* 🚨 CORRECCIÓN: Quitamos 'max-w-6xl mx-auto' y ponemos 'w-full' */}
-        <div className="w-full">
+        {/* Contenedor interno para limitar el ancho máximo si la pantalla es gigante (opcional) 
+            o usar w-full para llenar el espacio disponible dentro del main.
+        */}
+         <div className="w-full max-w-[1920px] mx-auto">
           {children}
         </div>
 
