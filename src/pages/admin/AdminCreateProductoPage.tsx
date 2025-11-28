@@ -170,7 +170,7 @@ const AdminCreateProductoPage = () => {
         subtitle="Administra los detalles y precios del catálogo."
       />
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} encType='multipart-form/data'>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Columna 1 y 2 (8/12) */}

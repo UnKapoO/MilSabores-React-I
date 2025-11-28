@@ -5,7 +5,7 @@ const adminLinks = [
   { to: '/admin', label: 'Dashboard', icon: 'fa-solid fa-house' },
   { to: '/admin/pedidos', label: 'Pedidos', icon: 'fa-solid fa-clipboard-list' },
   { to: '/admin/productos', label: 'Productos', icon: 'fa-solid fa-box-open' },
-  { to: '/admin/clientes', label: 'Clientes', icon: 'fa-solid fa-users' },
+  //{ to: '/admin/clientes', label: 'Clientes', icon: 'fa-solid fa-users' },
 ];
 
 const Sidebar = () => {

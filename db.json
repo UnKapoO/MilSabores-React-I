@@ -43,6 +43,16 @@
       "beneficios": [],
       "cuponUsado": null,
       "fechaRegistro": "2025-11-20T13:59:41.402Z"
+    },
+    {
+      "id": "c064",
+      "nombre": "wence",
+      "email": "wenceslao@gmail.com",
+      "password": "asdf1234",
+      "rol": "cliente",
+      "beneficios": [],
+      "cuponUsado": "HSHSHSHSHSHSHSHSHSHS",
+      "fechaRegistro": "2025-11-20T19:36:50.232Z"
     }
   ],
   "pedidos": [
@@ -212,6 +222,79 @@
       "pago": {
         "metodo": "webpay"
       }
+    },
+    {
+      "id": "ORD-1763666880129",
+      "userId": "guest",
+      "fecha": "2025-11-20T19:28:00.129Z",
+      "total": 90000,
+      "estado": "pendiente",
+      "items": [
+        {
+          "nombre": "Torta Cuadrada de Chocolate (Personalizado)",
+          "cantidad": 1,
+          "precio": 45000,
+          "imagen": "img/torta-cuadrada-chocolate-ganache.jpg",
+          "cantidadPersonas": "Estándar (10-12 personas) - Precio base",
+          "mensajeEspecial": "Que te importa",
+          "colorGlaseado": "chocolate"
+        },
+        {
+          "nombre": "Torta Circular de Manjar",
+          "cantidad": 1,
+          "precio": 42000,
+          "imagen": "img/torta-circular-manjar.jpg"
+        }
+      ],
+      "cliente": {
+        "nombre": "dio",
+        "telefono": "616161655",
+        "email": "dio@gmail.com",
+        "calle": "por alla 123",
+        "numero": "123",
+        "tipoVivienda": "casa",
+        "comuna": "concepcion",
+        "fechaEntrega": "2025-11-20",
+        "direccion": "por alla 123 #123 (casa)"
+      },
+      "pago": {
+        "metodo": "webpay"
+      }
+    },
+    {
+      "id": "ORD-1763667525062",
+      "userId": "wenceslao@gmail.com",
+      "fecha": "2025-11-20T19:38:45.062Z",
+      "total": 101000,
+      "estado": "pendiente",
+      "items": [
+        {
+          "nombre": "Torta Cuadrada de Frutas",
+          "cantidad": 1,
+          "precio": 50000,
+          "imagen": "img/torta-cuadrada-frutas-crema-chantilly.jpg"
+        },
+        {
+          "nombre": "Torta Sin Azúcar de Naranja",
+          "cantidad": 1,
+          "precio": 48000,
+          "imagen": "img/torta-naranja-sin-azucar-saludable.jpg"
+        }
+      ],
+      "cliente": {
+        "nombre": "pedro",
+        "telefono": "575757575",
+        "email": "wenceslao@gmail.com",
+        "calle": "por alla 123",
+        "numero": "123",
+        "tipoVivienda": "casa",
+        "comuna": "concepcion",
+        "fechaEntrega": "2025-12-20",
+        "direccion": "por alla 123 #123 (casa)"
+      },
+      "pago": {
+        "metodo": "webpay"
+      }
     }
   ],
   "blog": [
@@ -287,17 +370,6 @@
     }
   ],
   "productos": [
-    {
-      "id": "1",
-      "codigo": "TC001",
-      "categoria": "tortas-cuadradas",
-      "nombre": "Torta Cuadrada de Chocolate",
-      "precio": 45000,
-      "descripcion": "Deliciosa torta de chocolate con capas de ganache y un toque de avellanas. Personalizable con mensajes especiales.",
-      "imagen": "img/torta-cuadrada-chocolate-ganache.jpg",
-      "icono": "fa-solid fa-birthday-cake",
-      "stock": 5
-    },
     {
       "id": "2",
       "codigo": "TC002",
@@ -460,6 +532,19 @@
       "descuento": 0,
       "stock": 1,
       "imagen": ""
+    },
+    {
+      "id": "3fa9",
+      "nombre": "Torta de algo",
+      "descripcion": "torta rica",
+      "historia": "la mejor torta",
+      "codigo": "23456789",
+      "categoria": "tortas-cuadradas",
+      "estado": "activo",
+      "precio": 0,
+      "descuento": 0,
+      "stock": 0,
+      "imagen": "img/yoshiii.jpg"
     }
   ]
 }
