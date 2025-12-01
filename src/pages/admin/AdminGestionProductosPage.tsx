@@ -9,7 +9,9 @@ import { SelectField, type SelectOption } from '../../components/ui/common/Selec
 import type { Product } from '../../types/Product';
 import { obtenerNombreCategoria } from '../../utils/formatters';
 
-const API_URL = 'http://localhost:3001/productos';
+import { API_BASE_URL } from '../../config/api';
+
+const API_URL = `${API_BASE_URL}/productos`; // le asignas el valor importado de api.ts
 
 const AdminGestionProductosPage = () => {
     const navigate = useNavigate();

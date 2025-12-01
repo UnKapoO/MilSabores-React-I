@@ -8,8 +8,10 @@ import FormPanel from '../../components/ui/admin/FormPanel';
 import AdminPageHeader from '../../components/ui/admin/AdminPageHeader';
 import ImageUploader from '../../components/ui/admin/ImageUploader';
 
-// La URL de tu API (json-server)
-const API_URL = 'http://localhost:3001/productos';
+
+import { API_BASE_URL } from '../../config/api';
+
+const API_URL = `${API_BASE_URL}/productos`; // le asignas el valor importado de api.ts
 
 
 // --- Definiciones de datos estáticos para SelectField ---
