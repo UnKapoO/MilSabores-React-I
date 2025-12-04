@@ -14,6 +14,7 @@ import { PersonalizationForm } from '../../components/ui/PersonalizationForm';
 // --- Imports de Lógica y Utils ---
 import { useCart } from '../../context/CartContext';
 import { formatearPrecio, getImageUrl } from '../../utils/formatters';
+import { API_BASE_URL } from '../../config/api';
 
 // Configuración del API
 const API_URL = '${API_BASE_URL}';
@@ -40,18 +41,21 @@ function ProductDetailPage() {
             setIsLoading(true);
             setRecomendados([]);
             try {
+                
                 // 1. Cargar Producto Principal
-                const response = await fetch(`${API_URL}/productos/${productId}`);
-                if (!response.ok) throw new Error('Producto no encontrado');
+                const response = await fetch(`${API_BASE_URL}/productos/${productId}`);                if (!response.ok) throw new Error('Producto no encontrado');
                 const data: Product = await response.json();
                 setProduct(data);
 
                 // 2. Cargar Recomendados (Misma categoría, excluyendo el actual)
-                const relatedResponse = await fetch(
-                    `${API_URL}/productos?categoria=${data.categoria}&id_ne=${data.id}&_limit=4`
-                );
-                const relatedData: Product[] = await relatedResponse.json();
-                setRecomendados(relatedData);
+                const relatedRes = await fetch(`${API_BASE_URL}/productos`);
+                const relatedData: Product[] = await relatedRes.json();
+                
+                const filteredRecomendados = relatedData
+                    .filter(p => p.categoria === data.categoria && p.id !== data.id)
+                    .slice(0, 4);
+                
+                setRecomendados(filteredRecomendados);
             } catch (error) {
                 console.error(error);
                 setProduct(null);

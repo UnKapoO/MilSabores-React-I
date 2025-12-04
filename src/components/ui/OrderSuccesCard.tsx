@@ -33,7 +33,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                 </div>
                 <h1 className="font-secundaria text-5xl text-dark mb-4">¡Compra Aprobada!</h1>
                 <p className="text-xl text-letra-cafe">
-                    Gracias {orden.cliente.nombre}, tu pedido ha sido procesado exitosamente.
+                    Gracias {orden?.cliente?.nombre || 'Cliente'}, tu pedido ha sido procesado exitosamente.
                 </p>
             </div>
 
@@ -47,7 +47,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                     <div className="text-right">
                         <span className="text-sm text-letra-gris block">Fecha del pedido:</span>
                         <span className="font-bold text-dark">
-                            {formatearFecha(orden.fechaCreacion)}
+                            {formatearFecha(orden?.fechaCreacion)}
                         </span>
                     </div>
                 </div>
@@ -59,7 +59,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                         Productos Comprados
                     </h3>
                     <div className="space-y-4">
-                        {orden.items.map((item: any, index: number) => (
+                        {orden?.items.map((item: any, index: number) => (
                             <div key={index} className="flex justify-between items-start">
                                 <div className="flex gap-4">
                                     <img src={`/${item.imagen}`} alt={item.nombre} className="w-16 h-16 object-cover rounded-md border border-gray-200" />
@@ -95,16 +95,16 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                         <ul className="space-y-3 text-letra-cafe">
                             <li>
                                 <span className="font-bold block text-xs text-letra-gris uppercase">Dirección:</span>
-                                {orden.cliente.direccion}
+                                {orden?.cliente?.direccion}
                             </li>
                             <li>
                                 <span className="font-bold block text-xs text-letra-gris uppercase">Comuna:</span>
-                                <span className="capitalize">{orden.cliente.comuna}</span>
+                                <span className="capitalize">{orden?.cliente?.comuna}</span>
                             </li>
                             <li>
                                 <span className="font-bold block text-xs text-letra-gris uppercase">Fecha Estimada:</span>
                                 {/* --- 2. CORREGIDO: Usamos formatearFecha aquí también --- */}
-                                {formatearFecha(orden.cliente.fechaEntrega)}
+                                {formatearFecha(orden?.cliente?.fechaEntrega)}
                             </li>
                         </ul>
                     </div>
@@ -123,7 +123,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                             <div>
                                 <span className="font-bold block text-xs text-letra-gris uppercase">Total Pagado:</span>
                                 <span className="text-2xl font-bold text-primary">
-                                    {formatearPrecio(orden.total)}
+                                    {formatearPrecio(orden?.total)}
                                 </span>
                             </div>
                         </div>
@@ -132,7 +132,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                             <i className="fa-solid fa-envelope mt-1"></i>
                             <div>
                                 <p className="font-bold">Boleta enviada</p>
-                                <p>Hemos enviado el comprobante a: <strong>{orden.cliente.email}</strong></p>
+                                <p>Hemos enviado el comprobante a: <strong>{orden?.cliente?.email}</strong></p>
                             </div>
                         </div>
                     </div>

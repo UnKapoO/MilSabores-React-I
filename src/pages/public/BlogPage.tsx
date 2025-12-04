@@ -8,7 +8,7 @@ import { Modal } from '../../components/ui/common/Modal';
 import ProductFilterBar from '../../components/ui/ProductFilterBar';
 import BlogCard from '../../components/ui/BlogCard';
 import { formatearFecha, obtenerNombreCategoriaBlog, getImageUrl } from '../../utils/formatters';
-
+import { API_BASE_URL } from '../../config/api';
 interface BlogPost {
     id: number;
     categoria: string;
@@ -41,7 +41,7 @@ function BlogPage() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch('${API_BASE_URL}/blog');
+                const response = await fetch(`${API_BASE_URL}/blog`);
                 const data: BlogPost[] = await response.json();
                 setAllPosts(data);
 

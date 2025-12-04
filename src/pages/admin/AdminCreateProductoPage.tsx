@@ -90,7 +90,14 @@ const AdminCreateProductoPage = () => {
   // --- MANEJADORES ---
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    const finalValue = type === 'number' ? parseFloat(value) : value;
+    
+    // ARREGLO: Si es número y está vacío, pon 0 o cadena vacía, no NaN
+    let finalValue: string | number = value;
+
+    if (type === 'number') {
+        finalValue = value === '' ? '' : parseFloat(value);
+    }
+
     setFormData(prevData => ({ ...prevData, [name]: finalValue }));
   };
 

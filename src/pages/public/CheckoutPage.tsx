@@ -10,6 +10,7 @@ import { InputField } from '../../components/ui/common/InputField';
 import { SelectField } from '../../components/ui/common/SelectField';
 import type { SelectOption } from '../../components/ui/common/SelectField'; 
 import { OrderSummary } from '../../components/ui/OrderSummary';
+import { API_BASE_URL } from '../../config/api';
 
 const breadcrumbLinks = [{ to: "/", label: "Inicio" }, { to: "/carrito", label: "Carrito" }];
 
@@ -149,7 +150,7 @@ function CheckoutPage() {
 
         try {
             // 4. PETICIÓN AL SERVIDOR
-            const response = await fetch('${API_BASE_URL}/pedidos', {
+            const response = await fetch(`${API_BASE_URL}/pedidos`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

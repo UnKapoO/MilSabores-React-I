@@ -33,7 +33,7 @@ const AdminGestionClientesPage = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('${API_BASE_URL}/usuarios');
+            const response = await fetch(`${API_BASE_URL}/usuarios`);
             const data = await response.json();
             setUsers(data);
         } catch (error) {
