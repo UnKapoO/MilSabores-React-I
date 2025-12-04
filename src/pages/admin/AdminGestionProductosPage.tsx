@@ -9,18 +9,20 @@ import { SelectField, type SelectOption } from '../../components/ui/common/Selec
 import type { Product } from '../../types/Product';
 import { obtenerNombreCategoria } from '../../utils/formatters';
 
-const API_URL = 'http://localhost:3001/productos';
+import { API_BASE_URL } from '../../config/api';
+
+const API_URL = `${API_BASE_URL}/productos`; // le asignas el valor importado de api.ts
 
 const AdminGestionProductosPage = () => {
     const navigate = useNavigate();
-    
+
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    
+
     // 1. ESTADO CLAVE: Guarda la categoría activa
-    const [activeCategory, setActiveCategory] = useState('todos'); 
+    const [activeCategory, setActiveCategory] = useState('todos');
     // 2. NUEVO ESTADO: Guarda el término de búsqueda
-    const [searchTerm, setSearchTerm] = useState(''); 
+    const [searchTerm, setSearchTerm] = useState('');
 
     // --- Lógica de Carga de Datos (Fetch) ---
     const fetchProducts = async () => {
@@ -39,10 +41,10 @@ const AdminGestionProductosPage = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, []); 
+    }, []);
 
     // --- Lógica de Filtrado (Calculada antes del renderizado) ---
-    
+
     // 3. Cálculo de Opciones de Filtro
     const categoryNames = products.map(p => p.categoria).filter(c => c);
     const uniqueCategories = [...new Set(categoryNames)];
@@ -58,7 +60,7 @@ const AdminGestionProductosPage = () => {
     // 4. Aplicación de Filtro y Búsqueda
     const filteredAndSearchedProducts = products.filter(product => {
         const categoryMatch = activeCategory === 'todos' || product.categoria === activeCategory;
-        
+
         // Convertimos el término de búsqueda y el nombre del producto a minúsculas para una comparación insensible
         const searchLower = searchTerm.toLowerCase();
         const nameLower = product.nombre.toLowerCase();
@@ -93,7 +95,7 @@ const AdminGestionProductosPage = () => {
             alert("✅ Producto eliminado correctamente.");
 
         } catch (error) {
-            alert("❌ No se pudo eliminar el producto. Verifica la conexión."); 
+            alert("❌ No se pudo eliminar el producto. Verifica la conexión.");
             console.error("Error al eliminar producto:", error);
         }
     };
@@ -107,7 +109,7 @@ const AdminGestionProductosPage = () => {
     );
 
     // --- Lógica de Renderizado Condicional ---
-    
+
     if (isLoading) {
         return (
             <AdminLayout>
@@ -119,6 +121,19 @@ const AdminGestionProductosPage = () => {
     if (products.length === 0 && !isLoading) {
         // ... (Mensaje de sin productos) ...
     }
+
+    // Función para construir la URL correcta de la imagen
+    const getImageUrl = (imagenPath: string | undefined) => {
+        // A. Si no hay imagen, mostramos una genérica (placeholder)
+        if (!imagenPath) return 'https://via.placeholder.com/150?text=Sin+Imagen';
+
+        // B. Si la imagen ya es un link completo (ej: Google Photos), la dejamos igual
+        if (imagenPath.startsWith('http')) return imagenPath;
+
+        // C. Si es una imagen local, le pegamos la dirección del Backend
+        // Resultado: http://localhost:8080/images/foto.jpg
+        return `${API_BASE_URL}/${imagenPath}`;
+    };
 
     // --- Renderizado de la Tabla ---
     return (
@@ -132,7 +147,7 @@ const AdminGestionProductosPage = () => {
 
             {/* FILTROS Y BÚSQUEDA */}
             <div className="mb-6 flex justify-between items-center gap-4">
-                
+
                 {/* BARRA DE BÚSQUEDA */}
                 <div className="relative w-full max-w-sm">
                     <i className="fa-solid fa-search absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400"></i>
@@ -144,7 +159,7 @@ const AdminGestionProductosPage = () => {
                         className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition-colors"
                     />
                 </div>
-                
+
                 {/* FILTRO DE CATEGORÍA */}
                 <div className="w-64">
                     <SelectField
@@ -171,7 +186,7 @@ const AdminGestionProductosPage = () => {
                     />
                 ))}
             </AdminTable>
-            
+
             {/* Mensaje de "No hay resultados" */}
             {filteredAndSearchedProducts.length === 0 && (
                 <div className="p-10 text-center bg-white rounded-xl shadow-lg mt-4">
