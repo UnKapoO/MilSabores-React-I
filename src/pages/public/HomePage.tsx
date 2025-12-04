@@ -7,6 +7,7 @@ import { FeatureCard } from '../../components/ui/FeatureCard';
 import { CategoryCard } from '../../components/ui/CategoryCard';
 import BlogCard from '../../components/ui/BlogCard';
 import { useCart } from '../../context/CartContext';
+import { API_BASE_URL } from '../../config/api';
 interface BlogPost {
   id: number;
   categoria: string,
@@ -54,18 +55,25 @@ function HomePage() {
     // Pedimos solo 4 productos para el Home
     const fetchFeaturedProducts = async () => {
       try {
-        const response = await fetch('${API_BASE_URL}/productos?_limit=3');
-        const data = await response.json();
-        setFeaturedProducts(data); // 3. Guardamos los productos en el estado
+        const response = await fetch(`${API_BASE_URL}/productos`);
+        if (!response.ok) throw new Error("Error loading products");
+        
+        const data: Product[] = await response.json();
+        setFeaturedProducts(data.slice(0, 4)); 
       } catch (error) {
         console.error("Error al cargar productos destacados:", error);
       }
     };
+    // 2. Fetch Blog Posts
     const fetchBlogPosts = async () => {
       try {
-        const response = await fetch('${API_BASE_URL}/blog?_limit=3'); // Traemos 3
-        const data: BlogPost[] = await response.json(); // Tipamos la data
-        setBlogPosts(data); // Guardamos en el nuevo estado
+        // CORRECCIÓN: Usamos backticks ` `
+        const response = await fetch(`${API_BASE_URL}/blog`);
+        if (!response.ok) throw new Error("Error loading blog");
+
+        const data: BlogPost[] = await response.json();
+        // CORRECCIÓN: Límite en JS
+        setBlogPosts(data.slice(0, 3)); 
       } catch (error) {
         console.error("Error al cargar posts del blog:", error);
       }
@@ -89,7 +97,6 @@ function HomePage() {
           className="container mx-auto px-4 flex flex-col justify-center items-center"
           style={{ minHeight: 'calc(100vh - 7rem)' }}
         >
-          {/* 3. Tu contenido  */}
           <h1 className="text-fondo-crema text-7xl font-secundaria">Mil Sabores</h1>
           <p className="text-fondo-crema text-2xl font-principal mt-4">Sabores únicos, momentos inolvidables.</p>
           <Link to="/catalogo">
@@ -201,7 +208,6 @@ function HomePage() {
               <Link
                 key={post.id}
                 to="/blog" // Navega a la página de Blog
-                // "state" es el "mensaje secreto" que le enviamos a la página /blog
                 state={{ openPostId: post.id }}
               >
                 <BlogCard
