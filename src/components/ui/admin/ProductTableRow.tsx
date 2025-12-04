@@ -1,7 +1,8 @@
 import React from 'react';
 import type { Product } from '../../../types/Product';
-import { formatearPrecio, obtenerNombreCategoria } from '../../../utils/formatters';
-import { Button } from '../common/Button'; // Usamos tu componente Button
+// 1. AGREGAMOS getImageUrl A LOS IMPORTS
+import { formatearPrecio, obtenerNombreCategoria, getImageUrl } from '../../../utils/formatters';
+import { Button } from '../common/Button'; 
 
 interface ProductTableRowProps {
   product: Product;
@@ -17,9 +18,10 @@ const ProductTableRow: React.FC<ProductTableRowProps> = ({ product, onEdit, onDe
       <td className="px-6 py-4">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
+            {/* 2. USAMOS LA FUNCIÓN AQUÍ PARA CORREGIR LA RUTA */}
             <img
               className="h-10 w-10 rounded-full object-cover"
-              src={`/${product.imagen}`}
+              src={getImageUrl(product.imagen)}
               alt={product.nombre}
             />
           </div>
@@ -49,7 +51,6 @@ const ProductTableRow: React.FC<ProductTableRowProps> = ({ product, onEdit, onDe
 
       {/* Columna 5: Acciones (Botones) */}
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        {/* 🚨 CORRECCIÓN: Usamos un div flex para el contenedor de botones */}
         <div className="flex justify-end items-center space-x-2">
           <Button
             onClick={() => onEdit(product.id)}
