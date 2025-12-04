@@ -7,7 +7,7 @@ import { EmptyState } from '../../components/ui/common/EmptyState';
 import { Modal } from '../../components/ui/common/Modal'; 
 import ProductFilterBar from '../../components/ui/ProductFilterBar';
 import BlogCard from '../../components/ui/BlogCard';
-import { formatearFecha, obtenerNombreCategoriaBlog } from '../../utils/formatters';
+import { formatearFecha, obtenerNombreCategoriaBlog, getImageUrl } from '../../utils/formatters';
 
 interface BlogPost {
     id: number;
@@ -135,7 +135,7 @@ function BlogPage() {
                 >
                     <div>
                         <img
-                            src={`/${selectedPost.imagen}`}
+                            src={getImageUrl(selectedPost.imagen)}
                             alt={selectedPost.titulo}
                             className="w-full h-64 object-cover rounded-md mb-4"
                         />

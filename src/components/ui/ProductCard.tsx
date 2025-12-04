@@ -1,33 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../../types/Product';
-
-// =========================================================================
-// 🟢 SECCIÓN 1: IMPORTS REALES (DESCOMENTA ESTO EN TU PROYECTO LOCAL)
-// =========================================================================
-/*
 import { formatearPrecio, getImageUrl } from '../../utils/formatters';
-*/
 
-// =========================================================================
-// 🟡 SECCIÓN 2: MOCKS PARA VISTA PREVIA (BORRA ESTO EN TU PROYECTO)
-// =========================================================================
-const API_BASE_URL = '${API_BASE_URL}';
-
-const getImageUrl = (imagenPath: string | undefined | null) => {
-    if (!imagenPath) return 'https://via.placeholder.com/300?text=Sin+Imagen';
-    if (imagenPath.startsWith('http')) return imagenPath;
-    return `${API_BASE_URL}/${imagenPath}`;
-};
-
-const formatearPrecio = (precio: number) => {
-    return new Intl.NumberFormat("es-CL", { 
-        style: "currency", 
-        currency: "CLP", 
-        minimumFractionDigits: 0 
-    }).format(precio);
-};
-// =========================================================================
 
 interface ProductCardProps {
   product: Product;

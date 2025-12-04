@@ -57,15 +57,18 @@ export function obtenerNombreCategoriaBlog(categoria: string): string {
     return categorias[categoria] || 'General';
 }
 
-// 2. NUEVA FUNCIÓN: Genera la URL correcta para las imágenes del Backend
-export const getImageUrl = (imagenPath: string | undefined | null) => {
-    // A. Si no hay ruta, retornamos una imagen gris por defecto
-    if (!imagenPath) return 'https://via.placeholder.com/150?text=Sin+Imagen';
+export const getImageUrl = (imagenPath: string | undefined) => {
+    if (!imagenPath) return '/img/placeholder.jpg';
+    
+    // 1. Si es una imagen de internet o Base64, úsala tal cual
+    if (imagenPath.startsWith('http') || imagenPath.startsWith('data:')) {
+        return imagenPath;
+    }
 
-    // B. Si la imagen ya tiene "http" (ej: viene de Google), la dejamos igual
-    if (imagenPath.startsWith('http')) return imagenPath;
+    if (imagenPath.startsWith('img/')) {
+        return `/${imagenPath}`; // Ej: "/img/torta.jpg" -> Busca en localhost:5173
+    }
 
-    // C. Si es una ruta local (ej: "images/foto.jpg"), le pegamos la dirección del Backend
-    // Resultado final: "${API_BASE_URL}/images/foto.jpg"
+    // 3. Si es una imagen subida al backend (futuro), usa el backend
     return `${API_BASE_URL}/${imagenPath}`;
 };

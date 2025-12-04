@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { formatearFecha, obtenerNombreCategoriaBlog } from '../../utils/formatters';
+import { formatearFecha, obtenerNombreCategoriaBlog, getImageUrl } from '../../utils/formatters';
 
 // 1. Definimos la nueva "forma" del Post (¡con autor y contenido!)
 interface BlogPost {
@@ -32,7 +32,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, onClick }) => {
             {/* 5. Traducimos tu .articulo-imagen */}
             <div className="relative">
                 <img
-                    src={`/${post.imagen}`}
+                    src={getImageUrl(post.imagen)}
                     alt={post.titulo}
                     className="w-full h-48 object-cover"
                 />
