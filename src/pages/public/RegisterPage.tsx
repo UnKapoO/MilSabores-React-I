@@ -15,14 +15,15 @@ function RegisterPage() {
         nombre: '',
         email: '',
         password: '',
-        repass: '', // 'confirmPassword' en tu HTML original se llamaba 'repass'
+        repass: '',
+        fechaNacimiento: '',
         cupon: ''
     });
 
     const [isLoading, setIsLoading] = useState(false);
     // Estado para guardar los mensajes de error
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+    const today = new Date().toISOString().split('T')[0];
     // --- Manejador de Cambios ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -69,6 +70,8 @@ function RegisterPage() {
     };
 
     // --- Envío del Formulario ---
+    const cupones_validos = ['FELICES50', 'DUOC2025'];
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -91,17 +94,26 @@ function RegisterPage() {
                 setIsLoading(false);
                 return;
             }
-
-            // 2. Aplicar lógica de cupones (Tu lógica de negocio)
-            let beneficios = [];
+            let beneficios: string[] = [];
             let mensajesExito = ["¡Registro exitoso!"];
+            const cuponIngresado = formData.cupon.trim().toUpperCase();
 
-            if (formData.cupon.toUpperCase() === 'FELICES50') {
-                beneficios.push("10% descuento vitalicio");
-                mensajesExito.push("¡Felicidades! Tienes 10% de descuento.");
+            // 2. Validamos el cupón SI es que escribió algo
+            if (cuponIngresado) {
+                if (!cupones_validos.includes(cuponIngresado)) {
+                    // Si NO está en la lista, error y detenemos
+                    setErrors(prev => ({ ...prev, cupon: "Este cupón no existe o expiró." }));
+                    addToast("Código de descuento inválido", "error");
+                    setIsLoading(false);
+                    return; // Detiene el proceso
+                }
+                if (cuponIngresado === 'FELICES50') {
+                    beneficios.push("10% descuento vitalicio");
+                    mensajesExito.push("¡Felicidades! Tienes 10% de descuento.");
+                }
             }
 
-            // Verificar email institucional (DUOC)
+            // Verificar email institucional (DUOC) 
             if (formData.email.includes('@duocuc.cl')) {
                 beneficios.push("Torta gratis en cumpleaños");
                 mensajesExito.push("¡Estudiante Duoc! Tienes beneficios especiales.");
@@ -195,7 +207,14 @@ function RegisterPage() {
                             error={errors.repass}
                         />
                     </div>
-
+                    <InputField
+                        label="Fecha de Nacimiento"
+                        name="fechaNacimiento"
+                        type="date"
+                        value={formData.fechaNacimiento}
+                        onChange={handleChange}
+                        max={today}
+                    />
                     <InputField
                         label="Código de Descuento (Opcional)"
                         name="cupon"

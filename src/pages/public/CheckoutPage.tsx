@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext'; // 1. Importamos AuthContext
+import { useAuth } from '../../context/AuthContext'; // <-- 1. IMPORTAMOS AUTH
 
+// --- Importamos los LEGOs ---
 import { Breadcrumb } from '../../components/ui/common/Breadcrumb';
 import { PageHeader } from '../../components/ui/common/PageHeader';
 import { InputField } from '../../components/ui/common/InputField';
 import { SelectField } from '../../components/ui/common/SelectField';
-import type { SelectOption } from '../../components/ui/common/SelectField'; // Importación de tipo separada
+import type { SelectOption } from '../../components/ui/common/SelectField'; 
 import { OrderSummary } from '../../components/ui/OrderSummary';
 
 const breadcrumbLinks = [{ to: "/", label: "Inicio" }, { to: "/carrito", label: "Carrito" }];
@@ -27,7 +28,6 @@ const viviendaOptions: SelectOption[] = [
     { value: "oficina", label: "Oficina" },
 ];
 
-// --- LÓGICA DE FECHAS (LOCAL) ---
 const getLocalDateString = (date: Date) => {
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - (offset * 60 * 1000));
@@ -36,10 +36,8 @@ const getLocalDateString = (date: Date) => {
 
 function CheckoutPage() {
     const navigate = useNavigate();
-    // 2. Sacamos el usuario del AuthContext
-    const { user } = useAuth();
-    // Nota: NO sacamos 'clearCart' aquí para evitar el bug del congelamiento
-    const { cart, addToast } = useCart();
+    const { user } = useAuth(); // <-- 2. SACAMOS EL USUARIO
+    const { cart, addToast } = useCart(); // (Sin clearCart aquí)
 
     // Cálculo de fechas
     const today = new Date();
@@ -55,6 +53,17 @@ function CheckoutPage() {
             addToast("Tu carrito está vacío, agrega productos primero.", "info");
         }
     }, [cart, navigate, addToast]);
+
+    // Auto-rellenado de datos si el usuario está logueado
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                nombre: user.nombre || '',
+                email: user.email || '',
+            }));
+        }
+    }, [user]);
 
     const [formData, setFormData] = useState({
         nombre: '', telefono: '', email: '',
@@ -107,31 +116,26 @@ function CheckoutPage() {
         return Object.keys(newErrors).length === 0;
     };
 
-    // 3. EL NUEVO HANDLER DE ENVÍO (ASYNC Y POST)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validate()) return;
 
         const direccionCompleta = `${formData.calle} #${formData.numero} (${formData.tipoVivienda})`;
 
-        // Construimos el objeto de la orden
         const newOrder = {
             // Usamos el email del usuario logueado, o "guest"
             userId: user ? user.email : "guest",
-
-            // Generamos un ID temporal (aunque json-server genera uno, esto es útil para mostrarlo inmediatamente)
+            
             id: `ORD-${Date.now()}`,
-
-            fecha: new Date().toISOString(),
+            
+            fechaCreacion: new Date().toISOString(),
             total: total,
             estado: "pendiente",
-            // Mapeamos los items para guardar solo lo importante
             items: cart.map(item => ({
                 nombre: item.nombre,
                 cantidad: item.cantidad,
                 precio: item.precio,
                 imagen: item.imagen,
-                // Guardamos personalización si existe
                 cantidadPersonas: item.cantidadPersonas,
                 mensajeEspecial: item.mensajeEspecial,
                 colorGlaseado: item.colorGlaseado
@@ -144,7 +148,7 @@ function CheckoutPage() {
         };
 
         try {
-            // 4. HACEMOS EL POST A LA BASE DE DATOS
+            // 4. PETICIÓN AL SERVIDOR
             const response = await fetch('http://localhost:3001/pedidos', {
                 method: 'POST',
                 headers: {
@@ -157,10 +161,9 @@ function CheckoutPage() {
                 throw new Error('Error al guardar el pedido');
             }
 
-            // Recuperamos la orden guardada (con el ID real si json-server lo cambió)
             const savedOrder = await response.json();
 
-            // 5. NAVEGAMOS A CONFIRMACIÓN (Sin limpiar carrito aquí)
+            // 5. NAVEGACIÓN EXITOSA
             navigate('/confirmacion', { state: { orden: savedOrder } });
 
         } catch (error) {
@@ -177,7 +180,7 @@ function CheckoutPage() {
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Sección Entrega */}
+                        
                         <section className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                             <h3 className="text-2xl font-bold text-dark mb-4 flex items-center gap-2">
                                 <i className="fa-solid fa-truck text-primary"></i> Información de Entrega
@@ -187,7 +190,7 @@ function CheckoutPage() {
                                 <InputField label="Teléfono *" name="telefono" type="tel" maxLength={9} placeholder="Ej: 912345678" value={formData.telefono} onChange={handleChange} error={errors.telefono} />
                             </div>
                             <InputField label="Correo electrónico *" name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} />
-
+                            
                             <div className="grid grid-cols-12 gap-4">
                                 <div className="col-span-8">
                                     <InputField label="Calle *" name="calle" type="text" maxLength={50} value={formData.calle} onChange={handleChange} error={errors.calle} />
@@ -215,7 +218,6 @@ function CheckoutPage() {
                             </div>
                         </section>
 
-                        {/* Sección Pago */}
                         <section className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                             <h3 className="text-2xl font-bold text-dark mb-4 flex items-center gap-2">
                                 <i className="fa-solid fa-credit-card text-primary"></i> Método de Pago

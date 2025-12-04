@@ -37,16 +37,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       )}
 
       {/* 4. Contenido Principal */}
-      {/* 🚨 CORRECCIÓN: Eliminamos 'w-full' de aquí.
-          'lg:ml-64': Deja el espacio para el sidebar fijo.
-          Al ser un elemento de bloque, llenará el resto del espacio automáticamente.
-      */}
+
       <main className="lg:ml-64 p-8 transition-all duration-300">
         
         {/* Contenedor interno para limitar el ancho máximo si la pantalla es gigante (opcional) 
             o usar w-full para llenar el espacio disponible dentro del main.
         */}
-         <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto">
           {children}
         </div>
 

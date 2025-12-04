@@ -1,4 +1,3 @@
-
 export type OrderStatus = 'pendiente' | 'en-preparacion' | 'entregado' | 'cancelado';
 
 export interface OrderItem {
@@ -7,6 +6,10 @@ export interface OrderItem {
     cantidad: number;
     precio: number;
     imagen?: string;
+
+    cantidadPersonas?: string;
+    mensajeEspecial?: string;
+    colorGlaseado?: string;
 }
 
 export interface Order {
@@ -18,7 +21,14 @@ export interface Order {
     estado: OrderStatus;
     items?: OrderItem[];
     
-    // 🚨 ¡ESTA LÍNEA ES LA CLAVE! 🚨
-    // Si esta línea falta o no está guardada, saldrá el error rojo.
     originalDate?: string; 
+
+    // Necesario para mostrar dirección, teléfono y email en el Modal de Detalle
+    datosClienteCompleto?: {
+        nombre: string;
+        email: string;
+        telefono: string;
+        direccion: string;
+        comuna: string;
+    };
 }

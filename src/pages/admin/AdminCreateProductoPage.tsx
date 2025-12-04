@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react'; 
-import { useParams } from 'react-router-dom'; 
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // Añadí useNavigate
 import AdminLayout from '../../components/layout/admin/AdminLayout';
-import { InputField } from '../../components/ui/common/InputField';
-import { SelectField, type SelectOption } from '../../components/ui/common/SelectField';
-import { Button } from '../../components/ui/common/Button';
+import { InputField } from '../../components/ui/common/InputField'; // Corregí ruta
+import { SelectField, type SelectOption } from '../../components/ui/common/SelectField'; // Corregí ruta
+import { TextAreaField } from '../../components/ui/common/TextAreaField'; // Asegúrate de tener este
+import { Button } from '../../components/ui/common/Button'; // Corregí ruta
 import FormPanel from '../../components/ui/admin/FormPanel';
 import AdminPageHeader from '../../components/ui/admin/AdminPageHeader';
 import ImageUploader from '../../components/ui/admin/ImageUploader';
+import { useCart } from '../../context/CartContext'; // Para usar addToast
 
-// La URL de tu API (json-server)
 const API_URL = 'http://localhost:3001/productos';
 
-
-// --- Definiciones de datos estáticos para SelectField ---
 const categoriasOptions: SelectOption[] = [
   { value: 'tortas-cuadradas', label: 'Tortas Cuadradas' },
   { value: 'tortas-circulares', label: 'Tortas Circulares' },
@@ -29,138 +28,162 @@ const estadoOptions: SelectOption[] = [
   { value: 'inactivo', label: 'Oculto' },
 ];
 
-// --- Estado Inicial del Formulario ---
+// Definimos el estado inicial
 const initialFormState = {
   nombre: '',
   descripcion: '',
   historia: '',
   codigo: '',
-  categoria: 'tortas-cuadradas', 
-  estado: 'activo', 
+  categoria: 'tortas-cuadradas',
+  estado: 'activo',
   precio: 0,
   descuento: 0,
   stock: 0,
-  imagenFile: null as File | null, // Para el objeto File
-  imagenUrl: '', // Para la URL existente en modo edición
+  imagenFile: null as File | null,
+  imagenUrl: '',
 };
 
-// Definimos el tipo de datos del estado
-type FormDataType = typeof initialFormState;
-
-
 const AdminCreateProductoPage = () => {
-  const params = useParams(); // { id: '5' } o {}
-  const productId = params.id; // Puede ser '5' o undefined
+  const navigate = useNavigate();
+  const { addToast } = useCart();
+  const params = useParams();
+  const productId = params.id;
 
-  const [formData, setFormData] = useState<FormDataType>(initialFormState);
-  // El loading solo es necesario en modo edición
-  const [isLoading, setIsLoading] = useState(!!productId); 
-  // Contador para forzar el reseteo visual de ImageUploader
-  const [imageResetKey, setImageResetKey] = useState(0); 
+  const [formData, setFormData] = useState(initialFormState);
+  const [isLoading, setIsLoading] = useState(!!productId);
+  const [imageResetKey, setImageResetKey] = useState(0);
 
-  
-
-  // --- LÓGICA DE CARGA DE DATOS (Para modo Edición) ---
+  // --- CARGA DE DATOS (Edición) ---
   useEffect(() => {
-    if (!productId) return; // Si no hay ID, salimos (Modo Creación)
+    if (!productId) return;
 
     const fetchProductForEdit = async () => {
       setIsLoading(true);
       try {
         const response = await fetch(`${API_URL}/${productId}`);
-        if (!response.ok) throw new Error('Producto no encontrado para edición');
-        
-        const data = await response.json();
+        if (!response.ok) throw new Error('Producto no encontrado');
 
-        // Mapeamos los datos de la API al estado de nuestro formulario
+        const data = await response.json();
         setFormData({
           ...data,
-          // Guardamos la URL existente, si la hay
           imagenUrl: data.imagen || '',
-          // El archivo a subir es nulo por defecto (solo se usa al cambiar)
-          imagenFile: null, 
+          imagenFile: null,
         });
       } catch (error) {
-        console.error("Error al cargar producto para edición:", error);
+        console.error("Error:", error);
+        addToast("Error al cargar producto", "error");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProductForEdit();
-  }, [productId]); // Se dispara cuando la URL de edición cambia
+  }, [productId, addToast]);
 
-  // Función genérica para manejar el cambio en Input/Select
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // --- MANEJADORES ---
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
-    const finalValue: string | number = type === 'number' ? parseFloat(value) : value;
+    const finalValue = type === 'number' ? parseFloat(value) : value;
 
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: finalValue,
-    }));
+    setFormData(prevData => ({ ...prevData, [name]: finalValue }));
   };
 
-  // Función para manejar la selección de Imagen
   const handleImageSelect = (file: File | null) => {
-    setFormData(prevData => ({
-      ...prevData,
-      imagenFile: file, // Guardamos el objeto File o null
-    }));
+    setFormData(prevData => ({ ...prevData, imagenFile: file }));
   };
-  
-  // --- LÓGICA DE ENVÍO (POST o PATCH) ---
+
+  // --- FUNCIÓN HELPER: Convertir File a Base64 ---
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  // --- ENVÍO DEL FORMULARIO ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // 1. Prepara los datos (remueve imagenFile y usa la URL correcta)
-    const dataToSend = { 
-        ...formData, 
-        // Si hay una imagen nueva, usa el nombre del archivo. Si no, usa la URL antigua.
-        imagen: formData.imagenFile ? `img/${formData.imagenFile.name}` : formData.imagenUrl,
-        // Eliminamos las props de control del estado
-        imagenFile: undefined,
-        imagenUrl: undefined,
-    };
-    
-    // Determina el método y la URL
-    const method = productId ? 'PATCH' : 'POST'; 
-    const url = productId ? `${API_URL}/${productId}` : API_URL;
+    setIsLoading(true);
 
     try {
-        const response = await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dataToSend), 
-        });
+      // 1. VALIDACIÓN DE NOMBRE REPETIDO
+      // (Solo si es nuevo producto o si el nombre cambió)
+      // Para simplificar, verificamos siempre.
+      const checkRes = await fetch(`${API_URL}?nombre=${formData.nombre}`);
+      const foundProducts = await checkRes.json();
 
-        if (!response.ok) throw new Error(`Error ${method} en la API: Código ${response.status}`);
-        
-        // Muestra el mensaje de éxito
-        const successMessage = productId ? 'actualizado' : 'creado';
-        alert(`🎉 Producto ${successMessage} con éxito!`);
-        
-        // Limpia el formulario y reinicia la clave
-        setFormData(initialFormState);
-        setImageResetKey(prev => prev + 1);
+      // Si encontramos productos con ese nombre...
+      if (foundProducts.length > 0) {
+        // Verificamos que NO sea el mismo producto que estamos editando
+        const isSameProduct = productId && foundProducts[0].id === productId;
+
+        if (!isSameProduct) {
+          addToast("¡Ya existe un producto con ese nombre!", "error");
+          setIsLoading(false);
+          return; // Detenemos el guardado
+        }
+      }
+
+      // 2. MANEJO DE IMAGEN (Conversión a Base64)
+      let imagenFinal = formData.imagenUrl; // Por defecto, la URL antigua
+
+      if (formData.imagenFile) {
+        // Si hay archivo nuevo, lo convertimos
+        try {
+          imagenFinal = await convertToBase64(formData.imagenFile);
+        } catch (error) {
+          addToast("Error al procesar la imagen", "error");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 3. PREPARAR DATOS
+      const dataToSend = {
+        ...formData,
+        imagen: imagenFinal, // Guardamos el string Base64 (o la URL vieja)
+        // Limpiamos campos temporales
+        imagenFile: undefined,
+        imagenUrl: undefined,
+        // Aseguramos tipos numéricos
+        precio: Number(formData.precio),
+        stock: Number(formData.stock),
+        descuento: Number(formData.descuento)
+      };
+
+      // 4. GUARDAR (POST o PUT)
+      const method = productId ? 'PUT' : 'POST'; // Usamos PUT para reemplazar todo en edición
+      const url = productId ? `${API_URL}/${productId}` : API_URL;
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+
+      const successMessage = productId ? 'actualizado' : 'creado';
+      addToast(`Producto ${successMessage} con éxito!`, "success");
+
+      // Redirigir a la lista
+      navigate('/admin/productos');
 
     } catch (error) {
-        alert(`🔴 Error al guardar. Asegúrate que 'npm run server' esté activo.`);
-        console.error("Fallo al guardar:", error);
+      addToast("Error al guardar. Revisa tu conexión.", "error");
+      console.error("Fallo al guardar:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ----------------------------------------------------
-  // LÓGICA DE RENDERIZADO
-  // ----------------------------------------------------
-  
-  // Título y texto dinámico para el modo Creación/Edición
   const pageTitle = productId ? 'Editar Producto' : 'Nuevo Producto';
   const buttonText = productId ? 'Guardar Cambios' : 'Guardar Producto';
 
-  if (isLoading) {
-      return <AdminLayout><div className="p-20 text-center text-primary">Cargando producto...</div></AdminLayout>;
+  if (isLoading && productId) { // Solo mostramos carga si estamos editando al inicio
+    return <AdminLayout><div className="p-20 text-center text-primary">Cargando producto...</div></AdminLayout>;
   }
 
   return (
@@ -170,77 +193,77 @@ const AdminCreateProductoPage = () => {
         subtitle="Administra los detalles y precios del catálogo."
       />
 
-      <form onSubmit={handleSubmit} encType='multipart-form/data'>
+      <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Columna 1 y 2 (8/12) */}
+
+          {/* Columna 1 y 2 */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             <FormPanel title="Información Principal del Producto">
               <InputField
-                label="Nombre del Producto" type="text" name="nombre" placeholder="Ej: Torta de Chocolate Intenso"
-                value={formData.nombre} onChange={handleChange as any} />
-              <InputField
-                label="Descripción" type="text" name="descripcion" placeholder="Describe el producto..."
-                value={formData.descripcion} onChange={handleChange as any} />
-              <InputField
-                label="Historia" type="text" name="historia" placeholder="Historia del producto"
-                value={formData.historia} onChange={handleChange as any} />
+                label="Nombre del Producto" type="text" name="nombre" placeholder="Ej: Torta de Chocolate"
+                value={formData.nombre} onChange={handleChange} />
+
+              <TextAreaField // Usamos TextAreaField para descripción
+                label="Descripción" name="descripcion" placeholder="Describe el producto..."
+                value={formData.descripcion} onChange={handleChange as any} rows={4} />
+
+              <TextAreaField
+                label="Historia" name="historia" placeholder="Historia del producto"
+                value={formData.historia} onChange={handleChange as any} rows={2} />
             </FormPanel>
 
             <FormPanel title="Precio y Stock">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                {/* Precio Base, Descuento y Stock */}
                 <InputField
                   label="Precio Base" type="number" name="precio" placeholder="10000"
-                  value={formData.precio} onChange={handleChange as any} min="0" />
+                  value={formData.precio} onChange={handleChange} min="0" />
                 <InputField
-                  label="Descuento" type="number" name="descuento" placeholder="1000"
-                  value={formData.descuento} onChange={handleChange as any} min="0" />
+                  label="Descuento" type="number" name="descuento" placeholder="0"
+                  value={formData.descuento} onChange={handleChange} min="0" />
                 <InputField
                   label="Stock" type="number" name="stock" placeholder="100"
-                  value={formData.stock} onChange={handleChange as any} min="0" />
+                  value={formData.stock} onChange={handleChange} min="0" />
               </div>
             </FormPanel>
           </div>
 
-          {/* Columna 3 (4/12) */}
+          {/* Columna 3 */}
           <div className="lg:col-span-1 space-y-6">
-            
+
             <FormPanel title="Organización">
               <InputField
                 label="ID / SKU" type="text" name="codigo"
-                value={formData.codigo} onChange={handleChange as any} />
+                value={formData.codigo} onChange={handleChange} />
 
-              {/* SelectField para Categoría */}
               <SelectField
                 label="Categoría" name="categoria" value={formData.categoria}
                 onChange={handleChange as any} options={categoriasOptions} />
 
-              {/* SelectField para Estado */}
               <SelectField
                 label="Estado" name="estado" value={formData.estado}
                 onChange={handleChange as any} options={estadoOptions} />
             </FormPanel>
 
             <FormPanel title="Imagen del Producto">
-              <ImageUploader 
-                key={imageResetKey} 
+              <ImageUploader
+                key={imageResetKey}
                 onImageSelect={handleImageSelect}
-                // Si existe una URL, la pasamos para la previsualización inicial
-                initialPreviewUrl={formData.imagenUrl ? `/${formData.imagenUrl}` : undefined}
+                // Si hay imagenFile (nueva), no mostramos la URL vieja. Si no, mostramos la URL.
+                initialPreviewUrl={formData.imagenUrl ? (formData.imagenUrl.startsWith('data:') ? formData.imagenUrl : `/${formData.imagenUrl}`) : undefined}
               />
+              <p className="text-xs text-gray-400 mt-2">
+                * La imagen se guardará internamente (Base64) para esta demo.
+              </p>
             </FormPanel>
 
           </div>
         </div>
 
-        {/* Botón de Guardar */}
-        <div className="mt-8 text-right">
-          <Button type="submit" variant="primary">
+        <div className="mt-8 text-right pb-10">
+          <Button type="submit" variant="primary" disabled={isLoading}>
             <i className="fa-solid fa-save mr-2"></i>
-            {buttonText} {/* Texto dinámico */}
+            {isLoading ? 'Guardando...' : buttonText}
           </Button>
         </div>
       </form>

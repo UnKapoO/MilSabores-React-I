@@ -33,6 +33,14 @@ function CatalogoPage() {
   const [activeCategory, setActiveCategory] = useState(categoriaFromUrl || "todas");
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    if (categoriaFromUrl) {
+      setActiveCategory(categoriaFromUrl);
+    } else {
+      setActiveCategory("todas"); // Si no hay param, volvemos a 'todas'
+    }
+  }, [categoriaFromUrl]);
+
   // --- Estados de los Modales ---
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);

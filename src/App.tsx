@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PublicLayout from './components/layout/PublicLayout';
 import AdminLayout from './components/layout/admin/AdminLayout';
 
+// Componentes de Seguridad
+import ProtectedRoute from './components/auth/ProtectedRoute'; // <-- 1. IMPORTAMOS EL GUARDIA
+
 // Páginas Públicas
 import HomePage from './pages/public/HomePage';
 import CatalogoPage from './pages/public/CatalogoPage';
@@ -14,88 +17,114 @@ import CheckoutPage from './pages/public/CheckoutPage';
 import ConfirmacionPage from './pages/public/ConfirmacionPage';
 import UserProfilePage from './pages/public/UserProfilePage';
 import RegisterPage from './pages/public/RegisterPage';
-import LoginPage from './pages/public/LoginPage'; // 1. IMPORTAMOS LA PÁGINA REAL
+import LoginPage from './pages/public/LoginPage';
 
 // Páginas Admin
 import AdminHomePage from './pages/admin/AdminHomePage';
 import AdminGestionProductosPage from './pages/admin/AdminGestionProductosPage';
 import AdminCreateProductoPage from './pages/admin/AdminCreateProductoPage';
-import AdminGestionPedidosPage from './pages/admin/AdminGestionPedidosPage'; 
-
+import AdminGestionPedidosPage from './pages/admin/AdminGestionPedidosPage';
+import AdminGestionClientesPage from './pages/admin/AdminGestionClientesPage';
 // Utils y Contextos
 import ScrollToTop from './utils/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext'; // 2. IMPORTAMOS CARTPROVIDER (Necesario para las notificaciones del login)
-import NotificationToast from './components/ui/common/NotificationToast'; // 3. IMPORTAMOS EL TOAST
-
-// Componente Temporal (Solo queda el de clientes)
-const AdminGestionClientesPage = () => <h1 className="p-8 text-2xl">Gestión de Clientes (Próximamente)</h1>;
+import { CartProvider } from './context/CartContext';
+import NotificationToast from './components/ui/common/NotificationToast'; 
 
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        {/* 4. ENVUELVE CON CARTPROVIDER: El Login usa 'addToast' de aquí */}
         <CartProvider>
-          
-          <NotificationToast /> {/* Para ver los mensajes de error/éxito */}
+
+          <NotificationToast />
           <ScrollToTop />
 
           <Routes>
 
-            {/* =========================================
-              BLOQUE 1: RUTAS PÚBLICAS
-             ========================================= */}
-
+            {/* BLOQUE 1: RUTAS PÚBLICAS (Acceso libre)*/}
             <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
             <Route path="/catalogo" element={<PublicLayout><CatalogoPage /></PublicLayout>} />
             <Route path="/producto/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
             <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+
+            {/* Carrito y Checkout son públicos para permitir compra como invitado */}
             <Route path="/carrito" element={<PublicLayout><CarritoPage /></PublicLayout>} />
             <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
             <Route path="/confirmacion" element={<PublicLayout><ConfirmacionPage /></PublicLayout>} />
-            <Route path="/perfil" element={<PublicLayout><UserProfilePage /></PublicLayout>} />
 
-            {/* Rutas de Autenticación */}
-            {/* Ahora usa el componente real importado arriba */}
+            {/* Rutas de Autenticación (Públicas) */}
             <Route path="/login" element={<PublicLayout showFooter={false}><LoginPage /></PublicLayout>} />
             <Route path="/registro" element={<PublicLayout showFooter={false}><RegisterPage /></PublicLayout>} />
 
 
-            {/* =========================================
-              BLOQUE 2: RUTAS DE ADMINISTRACIÓN
-             ========================================= */}
+            {/* BLOQUE 2: RUTAS DE USUARIO (Protegidas)*/}
+            <Route
+              path="/perfil"
+              element={
+                // 2. PROTEGEMOS EL PERFIL
+                // Si no está logueado, lo manda al login
+                <ProtectedRoute>
+                  <PublicLayout><UserProfilePage /></PublicLayout>
+                </ProtectedRoute>
+              }
+            />
 
+            {/*BLOQUE 3: RUTAS DE ADMINISTRACIÓN (Protegidas + Admin)*/}
             <Route
               path="/admin"
-              element={<AdminLayout><AdminHomePage /></AdminLayout>}
+              element={
+                // 3. PROTEGEMOS EL ADMIN
+                // Si no es admin, lo manda al home
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminLayout><AdminHomePage /></AdminLayout>
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="/admin/productos"
-              element={<AdminGestionProductosPage />} 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminGestionProductosPage />
+                </ProtectedRoute>
+              }
             />
+
             <Route
               path="/admin/crear-producto"
-              element={<AdminCreateProductoPage />}
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminCreateProductoPage />
+                </ProtectedRoute>
+              }
             />
+
             <Route
               path="/admin/editar/:id"
-              element={<AdminCreateProductoPage />}
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminCreateProductoPage />
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="/admin/pedidos"
-              element={<AdminGestionPedidosPage />}
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminGestionPedidosPage />
+                </ProtectedRoute>
+              }
             />
 
             <Route
               path="/admin/clientes"
               element={
-                <AdminLayout>
-                  <AdminGestionClientesPage />
-                </AdminLayout>
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminGestionClientesPage /> 
+                </ProtectedRoute>
               }
             />
 

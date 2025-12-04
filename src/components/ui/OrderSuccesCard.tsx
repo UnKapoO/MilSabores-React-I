@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './common/Button';
-// Importamos nuestra función robusta
+
 import { formatearPrecio, formatearFecha } from '../../utils/formatters';
 
 interface OrderSuccessCardProps {
@@ -27,7 +27,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
         <div className="max-w-3xl mx-auto">
 
             {/* 1. Encabezado de Éxito */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-12 no-print">
                 <div className="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6 shadow-sm">
                     <i className="fa-solid fa-check text-5xl text-green-600"></i>
                 </div>
@@ -47,7 +47,6 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                     <div className="text-right">
                         <span className="text-sm text-letra-gris block">Fecha del pedido:</span>
                         <span className="font-bold text-dark">
-                            {/* --- 1. CORREGIDO: Usamos formatearFecha --- */}
                             {formatearFecha(orden.fechaCreacion)}
                         </span>
                     </div>
@@ -140,10 +139,10 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                 </div>
 
                 {/* Footer Botones */}
-                <div className="bg-gray-50 p-6 flex flex-col sm:flex-row justify-center gap-4 border-t border-gray-200">
-                    <Button variant="outline" onClick={() => alert("Descargando PDF...")}>
+                <div className="bg-gray-50 p-6 flex flex-col sm:flex-row justify-center gap-4 border-t border-gray-200 no-print">
+                    <Button variant="outline" onClick={() =>window.print()}>
                         <i className="fa-solid fa-file-pdf mr-2"></i>
-                        Descargar Boleta
+                        Guardar / Imprimir PDF
                     </Button>
 
                     <Link to="/catalogo">
@@ -155,7 +154,7 @@ export const OrderSuccessCard: React.FC<OrderSuccessCardProps> = ({ orden }) => 
                 </div>
             </div>
 
-            <div className="text-center mt-8">
+            <div className="text-center mt-8 no-print">
                 <Link to="/" className="text-primary font-bold hover:underline">
                     <i className="fa-solid fa-home mr-1"></i>
                     Volver al Inicio

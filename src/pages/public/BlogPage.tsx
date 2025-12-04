@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // Para leer el "mensaje" del Home
+import { useLocation } from 'react-router-dom'; 
 
-// --- 1. Importamos todos nuestros LEGOs del Kit ---
 import { Breadcrumb } from '../../components/ui/common/Breadcrumb';
 import { PageHeader } from '../../components/ui/common/PageHeader';
 import { EmptyState } from '../../components/ui/common/EmptyState';
-import { Modal } from '../../components/ui/common/Modal'; // ¡Importamos el Modal!
+import { Modal } from '../../components/ui/common/Modal'; 
 import ProductFilterBar from '../../components/ui/ProductFilterBar';
 import BlogCard from '../../components/ui/BlogCard';
 import { formatearFecha, obtenerNombreCategoriaBlog } from '../../utils/formatters';
 
-// --- 2. Definimos la "forma" del Post (completa) ---
 interface BlogPost {
     id: number;
     categoria: string;
@@ -22,7 +20,6 @@ interface BlogPost {
     contenido: string;
 }
 
-// --- 3. Definimos los "links" para el Breadcrumb ---
 const breadcrumbLinks = [
     { to: "/", label: "Inicio" }
 ];
@@ -90,7 +87,7 @@ function BlogPage() {
 
     return (
         <>
-            <div className="container mx-auto py-12 px-4">
+            <div className="container mx-auto py-12 px-4 bg-fondo-crema">
 
                 <Breadcrumb links={breadcrumbLinks} currentPage="Blog" />
 
