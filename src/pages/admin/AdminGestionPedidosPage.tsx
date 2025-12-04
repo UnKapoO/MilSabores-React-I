@@ -13,7 +13,15 @@ import type { Order } from '../../types/Order';
 import { Modal } from '../../components/ui/common/Modal';
 import { OrderDetailView } from '../../components/ui/admin/OrderDetailView';
 
-const API_URL = 'http://localhost:3001/pedidos';
+// const API_URL = 'http://localhost:3001/pedidos';
+
+
+//Modificaciones para conectar con el backend
+
+import { API_BASE_URL } from '../../config/api';
+
+const API_URL = `${API_BASE_URL}/pedidos`; // le asignas el valor importado de api.ts
+
 
 const AdminGestionPedidosPage = () => {
     // --- ESTADOS ---

@@ -14,7 +14,10 @@ import type { Order } from '../../types/Order';
 import { formatearPrecio, obtenerNombreCategoria } from '../../utils/formatters';
 import { useAuth } from '../../context/AuthContext';
 
-const API_URL = 'http://localhost:3001';
+//Modificaciones para conectar con el backend
+import { ENDPOINTS } from '../../config/api';
+
+//const API_URL = API_BASE_URL; // le asignas el valor importado de api.ts
 
 const AdminHomePage = () => {
     const navigate = useNavigate();
@@ -49,8 +52,8 @@ const AdminHomePage = () => {
             setIsLoading(true);
             try {
                 const [productsRes, ordersRes] = await Promise.all([
-                    fetch(`${API_URL}/productos`),
-                    fetch(`${API_URL}/pedidos`)
+                    fetch(ENDPOINTS.PRODUCTOS),
+                    fetch(ENDPOINTS.PEDIDOS)
                 ]);
 
                 const productsData: Product[] = await productsRes.json();

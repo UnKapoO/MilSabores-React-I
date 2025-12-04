@@ -12,14 +12,27 @@ import type { Product } from '../../types/Product';
 import { Modal } from '../../components/ui/common/Modal';
 import { useCart } from '../../context/CartContext'; 
 
-const API_URL = 'http://localhost:3001/productos';
+import { API_BASE_URL } from '../../config/api';
+
+const API_URL = `${API_BASE_URL}/productos`; // le asignas el valor importado de api.ts
 
 const AdminGestionProductosPage = () => {
     const navigate = useNavigate();
+<<<<<<< HEAD
     const { addToast } = useCart(); // Para mostrar mensajes bonitos
 
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+=======
+
+    const [products, setProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // 1. ESTADO CLAVE: Guarda la categoría activa
+    const [activeCategory, setActiveCategory] = useState('todos');
+    // 2. NUEVO ESTADO: Guarda el término de búsqueda
+    const [searchTerm, setSearchTerm] = useState('');
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
 
     // Estados de Filtro
     const [activeCategory, setActiveCategory] = useState('todos');
@@ -48,7 +61,13 @@ const AdminGestionProductosPage = () => {
         fetchProducts();
     }, []);
 
+<<<<<<< HEAD
     // --- Lógica de Filtrado ---
+=======
+    // --- Lógica de Filtrado (Calculada antes del renderizado) ---
+
+    // 3. Cálculo de Opciones de Filtro
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
     const categoryNames = products.map(p => p.categoria).filter(c => c);
     const uniqueCategories = [...new Set(categoryNames)];
 
@@ -65,6 +84,11 @@ const AdminGestionProductosPage = () => {
 
     const filteredAndSearchedProducts = products.filter(product => {
         const categoryMatch = activeCategory === 'todos' || product.categoria === activeCategory;
+<<<<<<< HEAD
+=======
+
+        // Convertimos el término de búsqueda y el nombre del producto a minúsculas para una comparación insensible
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
         const searchLower = searchTerm.toLowerCase();
         const nameLower = product.nombre.toLowerCase();
         const searchMatch = nameLower.includes(searchLower) || product.codigo.toLowerCase().includes(searchLower);
@@ -112,7 +136,11 @@ const AdminGestionProductosPage = () => {
             setProductToDelete(null);
 
         } catch (error) {
+<<<<<<< HEAD
             addToast("No se pudo eliminar el producto", "error");
+=======
+            alert("❌ No se pudo eliminar el producto. Verifica la conexión.");
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
             console.error("Error al eliminar producto:", error);
         }
     };
@@ -124,7 +152,11 @@ const AdminGestionProductosPage = () => {
         </Button>
     );
 
+<<<<<<< HEAD
     // --- RENDERIZADO ---
+=======
+    // --- Lógica de Renderizado Condicional ---
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
 
     if (isLoading) {
         return (
@@ -134,6 +166,27 @@ const AdminGestionProductosPage = () => {
         );
     }
 
+<<<<<<< HEAD
+=======
+    if (products.length === 0 && !isLoading) {
+        // ... (Mensaje de sin productos) ...
+    }
+
+    // Función para construir la URL correcta de la imagen
+    const getImageUrl = (imagenPath: string | undefined) => {
+        // A. Si no hay imagen, mostramos una genérica (placeholder)
+        if (!imagenPath) return 'https://via.placeholder.com/150?text=Sin+Imagen';
+
+        // B. Si la imagen ya es un link completo (ej: Google Photos), la dejamos igual
+        if (imagenPath.startsWith('http')) return imagenPath;
+
+        // C. Si es una imagen local, le pegamos la dirección del Backend
+        // Resultado: http://localhost:8080/images/foto.jpg
+        return `${API_BASE_URL}/${imagenPath}`;
+    };
+
+    // --- Renderizado de la Tabla ---
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
     return (
         <AdminLayout>
             <AdminPageHeader
@@ -143,7 +196,13 @@ const AdminGestionProductosPage = () => {
             />
 
             {/* FILTROS Y BÚSQUEDA */}
+<<<<<<< HEAD
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+=======
+            <div className="mb-6 flex justify-between items-center gap-4">
+
+                {/* BARRA DE BÚSQUEDA */}
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
                 <div className="relative w-full max-w-sm">
                     <InputField
                         label=""
@@ -157,7 +216,12 @@ const AdminGestionProductosPage = () => {
                     <i className="fa-solid fa-search absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                 </div>
 
+<<<<<<< HEAD
                 <div className="w-full sm:w-64">
+=======
+                {/* FILTRO DE CATEGORÍA */}
+                <div className="w-64">
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
                     <SelectField
                         label="Filtrar por Categoría"
                         name="categoryFilter"
@@ -183,6 +247,10 @@ const AdminGestionProductosPage = () => {
                 ))}
             </AdminTable>
 
+<<<<<<< HEAD
+=======
+            {/* Mensaje de "No hay resultados" */}
+>>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
             {filteredAndSearchedProducts.length === 0 && (
                 <div className="p-10 text-center bg-white rounded-xl shadow-lg mt-4 border border-gray-100">
                     <i className="fa-solid fa-box-open text-4xl text-gray-300 mb-2"></i>

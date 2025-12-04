@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Product } from '../../types/Product';
-import { formatearPrecio } from '../../utils/formatters';
+import { formatearPrecio, getImageUrl } from '../../utils/formatters';
 import { Button } from './common/Button';
 // ¡Quitamos 'useCart' y 'ProductCustomizer'!
 
@@ -32,11 +32,11 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product, o
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
             {/* --- COLUMNA IZQUIERDA: IMAGEN (Sin cambios) --- */}
-            <div className="bg-white p-4 rounded-lg shadow-md border">
+            <div>
                 <img
-                    src={`/${product.imagen}`}
+                    src={getImageUrl(product.imagen)}
                     alt={product.nombre}
-                    className="w-full h-auto object-cover rounded-lg"
+                    className="m-2 w-full h-64 md:h-[500px] object-cover rounded-lg"
                 />
             </div>
 
