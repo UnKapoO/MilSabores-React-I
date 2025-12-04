@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-// --- Importamos todos los LEGOs ---
+// --- MOCKS DE COMPONENTES UI (Para vista previa) ---
+// En tu local, usa tus imports reales:
 import { Breadcrumb } from '../../components/ui/common/Breadcrumb';
 import { PageHeader } from '../../components/ui/common/PageHeader';
 import { EmptyState } from '../../components/ui/common/EmptyState';
@@ -10,43 +11,65 @@ import { Button } from '../../components/ui/common/Button';
 import { Modal } from '../../components/ui/common/Modal';
 import { PersonalizationForm } from '../../components/ui/PersonalizationForm';
 import ProductFilterBar from '../../components/ui/ProductFilterBar';
-import ProductCard from '../../components/ui/ProductCard';
+import ProductCard from '../../components/ui/ProductCard'; // Usamos el que acabamos de definir arriba
 
-// --- Importamos el Cerebro y Tipos/Helpers ---
+// --- MOCKS DE UTILS (Para vista previa) ---
+// En tu local: import { formatearPrecio, obtenerNombreCategoria, getImageUrl } from '../../utils/formatters';
+const API_BASE_URL = 'http://localhost:8080';
+
+const getImageUrl = (imagenPath: string | undefined | null) => {
+    if (!imagenPath) return 'https://via.placeholder.com/150?text=Sin+Imagen';
+    if (imagenPath.startsWith('http')) return imagenPath;
+    return `${API_BASE_URL}/${imagenPath}`;
+};
+
+const formatearPrecio = (precio: number) => {
+    return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", minimumFractionDigits: 0 }).format(precio);
+};
+
+const obtenerNombreCategoria = (categoria: string) => {
+    if (categoria === 'todas') return 'Todas';
+    const categorias: { [key: string]: string } = {
+        "tortas-cuadradas": "Tortas Cuadradas",
+        "tortas-circulares": "Tortas Circulares",
+        "postres-individuales": "Postres Individuales",
+        "especiales": "Especiales",
+    };
+    return categorias[categoria] || categoria;
+};
+// ----------------------------------------------------
+
+// Imports Reales
 import { useCart } from '../../context/CartContext';
 import type { Product } from '../../types/Product';
-import { formatearPrecio, obtenerNombreCategoria } from '../../utils/formatters';
 
-// --- Datos para el Breadcrumb ---
 const breadcrumbLinks = [
   { to: "/", label: "Inicio" }
 ];
 
 function CatalogoPage() {
-  // --- Estados de la Página ---
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(["todas"]);
 
-  // --- Estados de Filtro y Búsqueda ---
   const [searchParams, setSearchParams] = useSearchParams();
   const categoriaFromUrl = searchParams.get('categoria');
   const [activeCategory, setActiveCategory] = useState(categoriaFromUrl || "todas");
   const [searchTerm, setSearchTerm] = useState('');
 
-  // --- Estados de los Modales ---
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isPersonalizeModalOpen, setIsPersonalizeModalOpen] = useState(false);
 
-  // --- Conexión al "Cerebro" ---
   const { addToCart } = useCart();
 
   // --- Carga de Datos (API) ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3001/productos');
+        const response = await fetch(`${API_BASE_URL}/productos`);
         const data: Product[] = await response.json();
+        
+        // 1. Guardamos los datos puros (ProductCard y getImageUrl se encargan de la ruta)
         setProducts(data);
 
         const allCategories = data.map((p: Product) => p.categoria);
@@ -60,6 +83,13 @@ function CatalogoPage() {
     fetchProducts();
   }, []);
 
+  // --- Sincronizar URL con estado activo ---
+  useEffect(() => {
+    if (categoriaFromUrl) {
+      setActiveCategory(categoriaFromUrl);
+    }
+  }, [categoriaFromUrl]);
+
   // --- Lógica de Filtrado ---
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'todas' || product.categoria === activeCategory;
@@ -67,7 +97,6 @@ function CatalogoPage() {
     return matchesCategory && matchesSearch;
   });
 
-  // --- Handlers de Filtro ---
   const handleFilterChange = (category: string) => {
     setActiveCategory(category);
     if (category === 'todas') {
@@ -77,7 +106,6 @@ function CatalogoPage() {
     }
   };
 
-  // --- Handlers de Modales ---
   const handleAddToCartClick = (product: Product) => {
     const categoriasTortas = ["tortas-cuadradas", "tortas-circulares", "especiales"];
 
@@ -119,7 +147,6 @@ function CatalogoPage() {
     setSelectedProduct(null);
   };
 
-  // --- Renderizado ---
   return (
     <>
       <div className="bg-fondo-crema container mx-auto py-12 px-4">
@@ -138,7 +165,7 @@ function CatalogoPage() {
             type="text"
             placeholder="Buscar por nombre (ej: Torta de Chocolate...)"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
           <i className="fa-solid fa-magnifying-glass text-letra-gris absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
@@ -153,7 +180,7 @@ function CatalogoPage() {
 
         <section className="mt-12">
           {activeCategory !== 'todas' && (
-            <h2 className="text-3xl font-bold mb-6">
+            <h2 className="text-3xl font-bold mb-6 capitalize">
               {obtenerNombreCategoria(activeCategory)}
             </h2>
           )}
@@ -178,7 +205,7 @@ function CatalogoPage() {
         </section>
       </div>
 
-      {/* --- Modales (no se ven hasta que se activan) --- */}
+      {/* --- Modales --- */}
 
       {/* Modal 1: Confirmación */}
       <Modal
@@ -189,7 +216,12 @@ function CatalogoPage() {
         {selectedProduct && (
           <div>
             <div className="bg-white -m-6 flex gap-4 items-center p-4 rounded-lg mb-4">
-              <img src={`/${selectedProduct.imagen}`} alt={selectedProduct.nombre} className="w-20 h-20 rounded-md object-cover" />
+              {/* Usamos getImageUrl para la imagen del modal */}
+              <img 
+                src={getImageUrl(selectedProduct.imagen)} 
+                alt={selectedProduct.nombre} 
+                className="w-20 h-20 rounded-md object-cover" 
+              />
               <div>
                 <h4 className="font-bold text-lg text-dark">{selectedProduct.nombre}</h4>
                 <p className="text-primary font-bold">{formatearPrecio(selectedProduct.precio)}</p>
