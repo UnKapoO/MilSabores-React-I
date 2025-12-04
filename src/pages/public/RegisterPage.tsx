@@ -155,7 +155,7 @@ function RegisterPage() {
                         label="Nombre Completo *"
                         name="nombre"
                         type="text"
-                        placeholder="Ej: Juan Pérez"
+                        placeholder="Ej: Wacoldo Soto"
                         value={formData.nombre}
                         onChange={handleChange}
                         error={errors.nombre}
