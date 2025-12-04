@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Product } from '../../types/Product';
-import { formatearPrecio } from '../../utils/formatters';
+import { formatearPrecio, getImageUrl} from '../../utils/formatters';
 import { Button } from './common/Button';
 import { SelectField } from './common/SelectField';
 import { InputField } from './common/InputField';
@@ -86,7 +86,7 @@ export const PersonalizationForm: React.FC<PersonalizationFormProps> = ({ produc
 
             {/* 1. Preview del Producto */}
             <div className="bg-white flex gap-4 items-center p-4 rounded-lg border border-gray-200">
-                <img src={`/${product.imagen}`} alt={product.nombre} className="w-20 h-20 rounded-md object-cover" />
+                <img src={getImageUrl(product.imagen)} alt={product.nombre} className="w-20 h-20 rounded-md object-cover" />
                 <div>
                     <h4 className="font-bold text-lg text-dark">{product.nombre}</h4>
                     <p className="text-letra-cafe">Precio base: {formatearPrecio(product.precio)}</p>
