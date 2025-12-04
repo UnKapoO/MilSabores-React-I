@@ -149,7 +149,7 @@ function CheckoutPage() {
 
         try {
             // 4. PETICIÓN AL SERVIDOR
-            const response = await fetch('http://localhost:3001/pedidos', {
+            const response = await fetch('${API_BASE_URL}/pedidos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

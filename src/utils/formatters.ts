@@ -66,6 +66,6 @@ export const getImageUrl = (imagenPath: string | undefined | null) => {
     if (imagenPath.startsWith('http')) return imagenPath;
 
     // C. Si es una ruta local (ej: "images/foto.jpg"), le pegamos la dirección del Backend
-    // Resultado final: "http://localhost:8080/images/foto.jpg"
+    // Resultado final: "${API_BASE_URL}/images/foto.jpg"
     return `${API_BASE_URL}/${imagenPath}`;
 };

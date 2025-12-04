@@ -16,7 +16,7 @@ import { useCart } from '../../context/CartContext';
 import { formatearPrecio, getImageUrl } from '../../utils/formatters';
 
 // Configuración del API
-const API_URL = 'http://localhost:8080';
+const API_URL = '${API_BASE_URL}';
 
 function ProductDetailPage() {
     const params = useParams();

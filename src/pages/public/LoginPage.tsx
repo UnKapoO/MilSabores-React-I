@@ -1,74 +1,71 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
-// 1. Hooks de Contexto
 import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext'; // Usamos useCart para el 'addToast'
-
-// 2. Componentes de UI (LEGOs)
-import { AuthCard } from '../../components/ui/AuthCard'; // Asegúrate de tener este componente
+import { useCart } from '../../context/CartContext';
+import { AuthCard } from '../../components/ui/AuthCard';
 import { InputField } from '../../components/ui/common/InputField';
 import { Button } from '../../components/ui/common/Button';
 
-// 3. Tipos
-import type { User } from '../../types/User';
+// Importamos la configuración de API
+import { ENDPOINTS } from '../../config/api';
 
 function LoginPage() {
     const navigate = useNavigate();
-    const { login } = useAuth(); 
-    const { addToast } = useCart(); // Usamos la notificación del carrito (la versión revertida)
+    const { login } = useAuth();
+    const { addToast } = useCart();
 
-    // Estados del formulario
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Estado para errores visuales
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // --- VALIDACIÓN VISUAL (Frontend) ---
+        const newErrors: { [key: string]: string } = {};
+        if (!email) newErrors.email = "Ingresa tu correo";
+        if (!password) newErrors.password = "Ingresa tu contraseña";
+
+        setErrors(newErrors); // Pinta los inputs de rojo si faltan datos
+        if (Object.keys(newErrors).length > 0) return; // Detiene todo aquí
+
+        // --- CONEXIÓN REAL (Backend Spring Boot) ---
         setIsLoading(true);
 
         try {
-            // 4. Petición a la API (Búsqueda exacta de usuario y contraseña)
-            // json-server devuelve un array con las coincidencias
-            const response = await fetch(`http://localhost:3001/usuarios?email=${email}&password=${password}`);
-            
-            if (!response.ok) throw new Error('Error en la conexión con el servidor');
-            
-            const users: User[] = await response.json();
+            const response = await fetch(ENDPOINTS.AUTH_LOGIN, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-            if (users.length > 0) {
-                // --- CASO ÉXITO ---
-                const userFound = users[0];
-                
-                // A. Guardamos la sesión
-                login(userFound);
-                
-                // B. Notificamos
-                addToast(`¡Bienvenido de nuevo, ${userFound.nombre || 'Usuario'}!`, 'success');
-
-                // C. Redirigimos según el rol
-                if (userFound.rol === 'admin') {
-                    navigate('/admin');
-                } else {
-                    navigate('/catalogo'); // O '/' si prefieres
-                }
-
-            } else {
-                // --- CASO ERROR (Credenciales inválidas) ---
-                addToast('Correo electrónico o contraseña incorrectos.', 'error');
+            if (!response.ok) {
+                // Si Spring Boot dice 400/401, mostramos error
+                throw new Error('Credenciales inválidas');
             }
+
+            const user = await response.json();
+
+            // Login exitoso
+            login(user);
+            addToast(`¡Bienvenido de nuevo!`, 'success');
+            navigate('/catalogo');
 
         } catch (error) {
             console.error("Error de login:", error);
-            addToast('Ocurrió un error al intentar iniciar sesión.', 'error');
+            addToast('Correo o contraseña incorrectos', 'error');
+            // También podemos marcar el input de password en rojo visualmente:
+            setErrors({ password: "Credenciales incorrectas" });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="container mx-auto py-12 px-4 flex justify-center items-center min-h-[80vh]">
-            {/* Usamos el AuthCard para mantener el estilo consistente */}
+        <div className="container mx-auto py-12 px-4 flex justify-center">
             <AuthCard
                 title="Iniciar Sesión"
                 subtitle="Bienvenido de vuelta a Mil Sabores"
@@ -76,8 +73,7 @@ function LoginPage() {
                 footerLinkText="Crear cuenta nueva"
                 footerLinkTo="/registro"
             >
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <InputField
                         label="Correo electrónico"
                         name="email"
@@ -85,6 +81,7 @@ function LoginPage() {
                         placeholder="ejemplo@gmail.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        error={errors.email} // <-- ¡AQUÍ SE MUESTRA EL ERROR VISUAL!
                     />
 
                     <div className="relative">
@@ -92,9 +89,10 @@ function LoginPage() {
                             label="Contraseña"
                             name="password"
                             type="password"
-                            placeholder="Ingresa tu contraseña"
+                            placeholder="Tu contraseña"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            error={errors.password} 
                         />
                     </div>
 
@@ -103,25 +101,14 @@ function LoginPage() {
                             <input type="checkbox" className="rounded text-primary focus:ring-primary" />
                             Recordarme
                         </label>
-                        <a href="#" className="text-primary font-bold hover:underline">
+                        <button type="button" onClick={() => addToast("Se envió un correo de recuperación", "info")} className="text-primary hover:underline">
                             ¿Olvidaste tu contraseña?
-                        </a>
+                        </button>
                     </div>
 
-                    <Button
-                        type="submit"
-                        className="w-full mt-4"
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <span className="flex items-center justify-center gap-2">
-                                <i className="fa-solid fa-spinner fa-spin"></i> Cargando...
-                            </span>
-                        ) : (
-                            'Iniciar Sesión'
-                        )}
+                    <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+                        {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
                     </Button>
-
                 </form>
             </AuthCard>
         </div>

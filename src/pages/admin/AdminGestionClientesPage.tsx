@@ -9,6 +9,7 @@ import { formatearFecha, formatearPrecio } from '../../utils/formatters';
 import type { User } from '../../types/User';
 import type { Order } from '../../types/Order';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../config/api'; 
 
 const AdminGestionClientesPage = () => {
     const { user: currentUser } = useAuth();
@@ -32,7 +33,7 @@ const AdminGestionClientesPage = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:3001/usuarios');
+            const response = await fetch('${API_BASE_URL}/usuarios');
             const data = await response.json();
             setUsers(data);
         } catch (error) {
@@ -56,7 +57,7 @@ const AdminGestionClientesPage = () => {
         if (!userToDelete) return;
 
         try {
-            await fetch(`http://localhost:3001/usuarios/${userToDelete.id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/usuarios/${userToDelete.id}`, { method: 'DELETE' });
             // Actualizamos la lista localmente
             setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
 
@@ -75,7 +76,7 @@ const AdminGestionClientesPage = () => {
         if (!window.confirm(`¿Cambiar rol de ${userToEdit.nombre} a ${newRole.toUpperCase()}?`)) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/usuarios/${userToEdit.id}`, {
+            const response = await fetch(`${API_BASE_URL}/usuarios/${userToEdit.id}`, {
                 method: 'PATCH', // Solo actualizamos un campo
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ rol: newRole })
@@ -99,7 +100,7 @@ const AdminGestionClientesPage = () => {
 
         try {
             // Buscamos pedidos por el email del usuario
-            const response = await fetch(`http://localhost:3001/pedidos?userId=${userToView.email}`);
+            const response = await fetch(`${API_BASE_URL}/pedidos?userId=${userToView.email}`);
             const data = await response.json();
             setUserOrders(data);
         } catch (error) {

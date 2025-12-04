@@ -4,45 +4,33 @@ import AdminLayout from '../../components/layout/admin/AdminLayout';
 import AdminPageHeader from '../../components/ui/admin/AdminPageHeader';
 import AdminTable from '../../components/ui/admin/AdminTable';
 import ProductTableRow from '../../components/ui/admin/ProductTableRow';
-import { Button } from '../../components/ui/common/Button'; 
-import { SelectField, type SelectOption } from '../../components/ui/common/SelectField'; 
-import { InputField } from '../../components/ui/common/InputField'; 
+import { Button } from '../../components/ui/common/Button';
+import { SelectField, type SelectOption } from '../../components/ui/common/SelectField';
+import { InputField } from '../../components/ui/common/InputField';
 import type { Product } from '../../types/Product';
 
+// 1. IMPORTAMOS MODAL, TOAST y API_BASE
 import { Modal } from '../../components/ui/common/Modal';
-import { useCart } from '../../context/CartContext'; 
+import { useCart } from '../../context/CartContext';
+import { API_BASE_URL } from '../../config/api'; 
 
-import { API_BASE_URL } from '../../config/api';
-
-const API_URL = `${API_BASE_URL}/productos`; // le asignas el valor importado de api.ts
+const API_URL = `${API_BASE_URL}/productos`;
 
 const AdminGestionProductosPage = () => {
     const navigate = useNavigate();
-<<<<<<< HEAD
-    const { addToast } = useCart(); // Para mostrar mensajes bonitos
-
+    const { addToast } = useCart();
+    
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-=======
+    
+    const [activeCategory, setActiveCategory] = useState('todos'); 
+    const [searchTerm, setSearchTerm] = useState(''); 
 
-    const [products, setProducts] = useState<Product[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    // 1. ESTADO CLAVE: Guarda la categoría activa
-    const [activeCategory, setActiveCategory] = useState('todos');
-    // 2. NUEVO ESTADO: Guarda el término de búsqueda
-    const [searchTerm, setSearchTerm] = useState('');
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
-
-    // Estados de Filtro
-    const [activeCategory, setActiveCategory] = useState('todos');
-    const [searchTerm, setSearchTerm] = useState('');
-
-    // 2. ESTADOS PARA EL MODAL DE ELIMINAR
+    // Estados para el Modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
-    // --- Lógica de Carga de Datos ---
+    // --- Carga de Datos ---
     const fetchProducts = async () => {
         setIsLoading(true);
         try {
@@ -59,36 +47,21 @@ const AdminGestionProductosPage = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, []); 
 
-<<<<<<< HEAD
-    // --- Lógica de Filtrado ---
-=======
-    // --- Lógica de Filtrado (Calculada antes del renderizado) ---
-
-    // 3. Cálculo de Opciones de Filtro
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
-    const categoryNames = products.map(p => p.categoria).filter(c => c);
-    const uniqueCategories = [...new Set(categoryNames)];
-
+    // --- Filtros ---
     const filterOptions: SelectOption[] = [
         { value: 'todos', label: '— Mostrar Todas las Categorías —' },
-        { value: 'tortas-cuadradas', label: 'Tortas Cuadradas' }, // Hardcodeamos para asegurar orden bonito
+        { value: 'tortas-cuadradas', label: 'Tortas Cuadradas' },
         { value: 'tortas-circulares', label: 'Tortas Circulares' },
         { value: 'postres-individuales', label: 'Postres Individuales' },
         { value: 'sin-azucar', label: 'Sin Azúcar' },
         { value: 'vegana', label: 'Vegana' },
         { value: 'especiales', label: 'Especiales' },
-        // ...uniqueCategories.map(...) // Opcional: si quieres dinámicos
     ];
 
     const filteredAndSearchedProducts = products.filter(product => {
         const categoryMatch = activeCategory === 'todos' || product.categoria === activeCategory;
-<<<<<<< HEAD
-=======
-
-        // Convertimos el término de búsqueda y el nombre del producto a minúsculas para una comparación insensible
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
         const searchLower = searchTerm.toLowerCase();
         const nameLower = product.nombre.toLowerCase();
         const searchMatch = nameLower.includes(searchLower) || product.codigo.toLowerCase().includes(searchLower);
@@ -103,15 +76,12 @@ const AdminGestionProductosPage = () => {
         setActiveCategory(e.target.value);
     };
 
-    // --- ACCIONES ---
-
+    // --- Acciones ---
     const handleEdit = (id: number) => {
         navigate(`/admin/editar/${id}`);
     };
 
-    // 3. NUEVA LÓGICA DE ELIMINAR (Con Modal)
-
-    // Paso A: Abrir el modal
+    // Abrir Modal
     const handleOpenDeleteModal = (id: number) => {
         const product = products.find(p => p.id === id);
         if (product) {
@@ -120,27 +90,20 @@ const AdminGestionProductosPage = () => {
         }
     };
 
-    // Paso B: Confirmar y borrar de verdad
+    // Confirmar Borrado
     const confirmDelete = async () => {
         if (!productToDelete) return;
 
         try {
             await fetch(`${API_URL}/${productToDelete.id}`, { method: 'DELETE' });
-
-            // Actualizar UI
             setProducts(products.filter(p => p.id !== productToDelete.id));
             addToast("Producto eliminado correctamente", "success");
-
-            // Cerrar modal
+            
             setIsDeleteModalOpen(false);
             setProductToDelete(null);
 
         } catch (error) {
-<<<<<<< HEAD
             addToast("No se pudo eliminar el producto", "error");
-=======
-            alert("❌ No se pudo eliminar el producto. Verifica la conexión.");
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
             console.error("Error al eliminar producto:", error);
         }
     };
@@ -152,41 +115,10 @@ const AdminGestionProductosPage = () => {
         </Button>
     );
 
-<<<<<<< HEAD
-    // --- RENDERIZADO ---
-=======
-    // --- Lógica de Renderizado Condicional ---
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
-
     if (isLoading) {
-        return (
-            <AdminLayout>
-                <div className="p-20 text-center text-gray-500">Cargando productos...</div>
-            </AdminLayout>
-        );
+        return <AdminLayout><div className="p-20 text-center text-gray-500">Cargando productos...</div></AdminLayout>;
     }
 
-<<<<<<< HEAD
-=======
-    if (products.length === 0 && !isLoading) {
-        // ... (Mensaje de sin productos) ...
-    }
-
-    // Función para construir la URL correcta de la imagen
-    const getImageUrl = (imagenPath: string | undefined) => {
-        // A. Si no hay imagen, mostramos una genérica (placeholder)
-        if (!imagenPath) return 'https://via.placeholder.com/150?text=Sin+Imagen';
-
-        // B. Si la imagen ya es un link completo (ej: Google Photos), la dejamos igual
-        if (imagenPath.startsWith('http')) return imagenPath;
-
-        // C. Si es una imagen local, le pegamos la dirección del Backend
-        // Resultado: http://localhost:8080/images/foto.jpg
-        return `${API_BASE_URL}/${imagenPath}`;
-    };
-
-    // --- Renderizado de la Tabla ---
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
     return (
         <AdminLayout>
             <AdminPageHeader
@@ -195,33 +127,21 @@ const AdminGestionProductosPage = () => {
                 actionButton={newProductButton}
             />
 
-            {/* FILTROS Y BÚSQUEDA */}
-<<<<<<< HEAD
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-=======
-            <div className="mb-6 flex justify-between items-center gap-4">
-
-                {/* BARRA DE BÚSQUEDA */}
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
                 <div className="relative w-full max-w-sm">
                     <InputField
-                        label=""
+                        label="" 
                         name="search"
                         type="text"
                         placeholder="Buscar por nombre o SKU..."
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="mb-0 pl-10" // Espacio para el ícono
+                        className="mb-0 pl-10"
                     />
                     <i className="fa-solid fa-search absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                 </div>
-
-<<<<<<< HEAD
+                
                 <div className="w-full sm:w-64">
-=======
-                {/* FILTRO DE CATEGORÍA */}
-                <div className="w-64">
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
                     <SelectField
                         label="Filtrar por Categoría"
                         name="categoryFilter"
@@ -233,24 +153,17 @@ const AdminGestionProductosPage = () => {
                 </div>
             </div>
 
-            {/* TABLA */}
-            <AdminTable
-                headers={["Producto", "Categoría", "Precio", "Stock", "Acciones"]}
-            >
+            <AdminTable headers={["Producto", "Categoría", "Precio", "Stock", "Acciones"]}>
                 {filteredAndSearchedProducts.map(product => (
                     <ProductTableRow
                         key={product.id}
                         product={product}
                         onEdit={handleEdit}
-                        onDelete={handleOpenDeleteModal} // 4. Pasamos la función que ABRE el modal
+                        onDelete={handleOpenDeleteModal}
                     />
                 ))}
             </AdminTable>
-
-<<<<<<< HEAD
-=======
-            {/* Mensaje de "No hay resultados" */}
->>>>>>> 537f9494c277b8ee04607440a0d1e30003695ce2
+            
             {filteredAndSearchedProducts.length === 0 && (
                 <div className="p-10 text-center bg-white rounded-xl shadow-lg mt-4 border border-gray-100">
                     <i className="fa-solid fa-box-open text-4xl text-gray-300 mb-2"></i>
@@ -258,7 +171,6 @@ const AdminGestionProductosPage = () => {
                 </div>
             )}
 
-            {/* 5. MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
             <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
@@ -269,14 +181,14 @@ const AdminGestionProductosPage = () => {
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                         <i className="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
                     </div>
-
+                    
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                         ¿Estás seguro de eliminar este producto?
                     </h3>
-
+                    
                     {productToDelete && (
                         <div className="bg-gray-50 p-3 rounded-lg mb-6 border border-gray-200 inline-flex items-center gap-3">
-                            <img src={productToDelete.imagen.startsWith('data:') ? productToDelete.imagen : `/${productToDelete.imagen}`} alt="" className="w-10 h-10 rounded object-cover" />
+                            <img src={productToDelete.imagen.startsWith('data:') || productToDelete.imagen.startsWith('http') ? productToDelete.imagen : `/${productToDelete.imagen}`} alt="" className="w-10 h-10 rounded object-cover" />
                             <div className="text-left">
                                 <p className="font-bold text-dark text-sm">{productToDelete.nombre}</p>
                                 <p className="text-xs text-gray-500">{productToDelete.codigo}</p>
@@ -292,7 +204,7 @@ const AdminGestionProductosPage = () => {
                         <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
                             Cancelar
                         </Button>
-                        <button
+                        <button 
                             onClick={confirmDelete}
                             className="bg-red-600 text-white font-bold py-2 px-6 rounded-full hover:bg-red-700 transition-colors shadow"
                         >

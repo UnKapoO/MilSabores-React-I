@@ -34,7 +34,7 @@ function UserProfilePage() {
             try {
                 // Buscamos pedidos donde userId coincida con el email del usuario
                 // (Ajusta esto si usas IDs numéricos en tu db.json)
-                const response = await fetch(`http://localhost:3001/pedidos?userId=${user.email}`);
+                const response = await fetch(`${API_BASE_URL}/pedidos?userId=${user.email}`);
                 const data = await response.json();
                 setOrders(data);
             } catch (error) {

@@ -54,7 +54,7 @@ function HomePage() {
     // Pedimos solo 4 productos para el Home
     const fetchFeaturedProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3001/productos?_limit=3');
+        const response = await fetch('${API_BASE_URL}/productos?_limit=3');
         const data = await response.json();
         setFeaturedProducts(data); // 3. Guardamos los productos en el estado
       } catch (error) {
@@ -63,7 +63,7 @@ function HomePage() {
     };
     const fetchBlogPosts = async () => {
       try {
-        const response = await fetch('http://localhost:3001/blog?_limit=3'); // Traemos 3
+        const response = await fetch('${API_BASE_URL}/blog?_limit=3'); // Traemos 3
         const data: BlogPost[] = await response.json(); // Tipamos la data
         setBlogPosts(data); // Guardamos en el nuevo estado
       } catch (error) {

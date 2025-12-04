@@ -12,7 +12,7 @@ import { formatearPrecio, getImageUrl } from '../../utils/formatters';
 // =========================================================================
 // 🟡 SECCIÓN 2: MOCKS PARA VISTA PREVIA (BORRA ESTO EN TU PROYECTO)
 // =========================================================================
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = '${API_BASE_URL}';
 
 const getImageUrl = (imagenPath: string | undefined | null) => {
     if (!imagenPath) return 'https://via.placeholder.com/300?text=Sin+Imagen';

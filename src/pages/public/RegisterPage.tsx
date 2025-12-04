@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useCart } from '../../context/CartContext'; // Para los Toasts
 
+// Importamos los LEGOs
 import { AuthCard } from '../../components/ui/AuthCard';
 import { InputField } from '../../components/ui/common/InputField';
 import { Button } from '../../components/ui/common/Button';
+
+// Importamos la configuración de la API (Spring Boot)
+import { ENDPOINTS } from '../../config/api';
 
 function RegisterPage() {
     const navigate = useNavigate();
@@ -16,14 +20,16 @@ function RegisterPage() {
         email: '',
         password: '',
         repass: '',
-        fechaNacimiento: '',
-        cupon: ''
+        cupon: '',
+        fechaNacimiento: ''
     });
 
     const [isLoading, setIsLoading] = useState(false);
-    // Estado para guardar los mensajes de error
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    // --- Fecha máxima (Hoy) para el input de nacimiento ---
     const today = new Date().toISOString().split('T')[0];
+
     // --- Manejador de Cambios ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -31,11 +37,12 @@ function RegisterPage() {
         // Limpiar error al escribir para mejorar UX
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
-    // --- LÓGICA DE VALIDACIÓN ESTRICTA ---
+
+    // --- LÓGICA DE VALIDACIÓN LOCAL (Visual) ---
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
 
-        // 1. Nombre: Solo letras y espacios, máx 30 caracteres
+        // 1. Validar Nombre
         const soloLetrasRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
         if (!formData.nombre.trim()) {
             newErrors.nombre = "El nombre es obligatorio.";
@@ -45,37 +52,40 @@ function RegisterPage() {
             newErrors.nombre = "El nombre es demasiado largo (máx 30).";
         }
 
-        // 2. Email: Formato estricto
+        // 2. Validar Correo
         const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         if (!formData.email.trim()) {
             newErrors.email = "El correo es obligatorio.";
         } else if (!regexEmail.test(formData.email)) {
-            newErrors.email = "Ingrese un correo válido (ej: nombre@dominio.com).";
+            newErrors.email = "Ingrese un correo válido.";
         }
 
-        // 3. Password: Mínimo 6 caracteres
+        // 3. Validar Contraseña
         if (!formData.password) {
             newErrors.password = "La contraseña es obligatoria.";
         } else if (formData.password.length < 6) {
             newErrors.password = "Mínimo 6 caracteres.";
         }
 
-        // 4. Confirmación
+        // 4. Validar Confirmación
         if (formData.password !== formData.repass) {
-            newErrors.confirmPassword = "Las contraseñas no coinciden.";
+            newErrors.repass = "Las contraseñas no coinciden.";
+        }
+
+        // 5. Validar Fecha (No futuro)
+        if (formData.fechaNacimiento && formData.fechaNacimiento > today) {
+            newErrors.fechaNacimiento = "La fecha no puede ser futura.";
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    // --- Envío del Formulario ---
-    const cupones_validos = ['FELICES50', 'DUOC2025'];
-
+    // --- ENVÍO A SPRING BOOT ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Si la validación falla, detenemos todo
+        // 1. Validación Visual
         if (!validate()) {
             addToast("Por favor corrige los errores", "error");
             return;
@@ -83,73 +93,48 @@ function RegisterPage() {
 
         setIsLoading(true);
 
+        // 2. Preparar objeto para Java (User Entity)
+        const newUser = {
+            nombre: formData.nombre,
+            email: formData.email,
+            password: formData.password,
+            rol: 'cliente', // Rol por defecto
+            fechaNacimiento: formData.fechaNacimiento,
+            // Enviamos el cupón (si el backend lo soporta, bien; si no, lo ignorará)
+            // cuponUsado: formData.cupon 
+        };
+
         try {
-            // 1. Verificar si el usuario ya existe (GET a json-server)
-            const checkResponse = await fetch(`http://localhost:3001/usuarios?email=${formData.email}`);
-            const existingUsers = await checkResponse.json();
-
-            if (existingUsers.length > 0) {
-                setErrors(prev => ({ ...prev, email: "Error: Este correo ya está registrado" }));
-                addToast("El correo ya existe", "error");
-                setIsLoading(false);
-                return;
-            }
-            let beneficios: string[] = [];
-            let mensajesExito = ["¡Registro exitoso!"];
-            const cuponIngresado = formData.cupon.trim().toUpperCase();
-
-            // 2. Validamos el cupón SI es que escribió algo
-            if (cuponIngresado) {
-                if (!cupones_validos.includes(cuponIngresado)) {
-                    // Si NO está en la lista, error y detenemos
-                    setErrors(prev => ({ ...prev, cupon: "Este cupón no existe o expiró." }));
-                    addToast("Código de descuento inválido", "error");
-                    setIsLoading(false);
-                    return; // Detiene el proceso
-                }
-                if (cuponIngresado === 'FELICES50') {
-                    beneficios.push("10% descuento vitalicio");
-                    mensajesExito.push("¡Felicidades! Tienes 10% de descuento.");
-                }
-            }
-
-            // Verificar email institucional (DUOC) 
-            if (formData.email.includes('@duocuc.cl')) {
-                beneficios.push("Torta gratis en cumpleaños");
-                mensajesExito.push("¡Estudiante Duoc! Tienes beneficios especiales.");
-            }
-
-            // 3. Crear el objeto Usuario
-            const newUser = {
-                nombre: formData.nombre,
-                email: formData.email,
-                password: formData.password,
-                rol: 'cliente',
-                beneficios: beneficios,
-                cuponUsado: formData.cupon || null,
-                fechaRegistro: new Date().toISOString()
-            };
-
-            // 4. Guardar en Base de Datos (POST)
-            const saveResponse = await fetch('http://localhost:3001/usuarios', {
+            // 3. POST al Backend Real
+            const response = await fetch(ENDPOINTS.AUTH_REGISTER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newUser)
             });
 
-            if (saveResponse.ok) {
-                // Mostramos todos los mensajes de éxito acumulados
-                mensajesExito.forEach(msg => addToast(msg, "success"));
+            if (response.ok) {
+                // ÉXITO
+                const msg = await response.text(); // "Usuario registrado exitosamente"
+                addToast(msg || "¡Cuenta creada con éxito!", "success");
 
-                // Redirigir al Login después de 2 segundos (como en tu JS original)
+                // Redirigir al Login
                 setTimeout(() => navigate('/login'), 2000);
+
             } else {
-                throw new Error("Error al guardar");
+                // ERROR DEL SERVIDOR (Ej: Email duplicado)
+                const errorMsg = await response.text();
+                console.error("Error del server:", errorMsg);
+
+                if (errorMsg.toLowerCase().includes("email") || errorMsg.toLowerCase().includes("correo")) {
+                    setErrors(prev => ({ ...prev, email: "Este correo ya está registrado" }));
+                }
+
+                addToast(`Error: ${errorMsg}`, "error");
             }
 
         } catch (error) {
-            console.error(error);
-            addToast("Error de conexión", "error");
+            console.error("Error de red:", error);
+            addToast("No se pudo conectar con el servidor", "error");
         } finally {
             setIsLoading(false);
         }
@@ -167,21 +152,21 @@ function RegisterPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     <InputField
-                        label="Nombre Completo"
+                        label="Nombre Completo *"
                         name="nombre"
-                        maxLength={40}
                         type="text"
-                        placeholder="Wacoldo Soto"
+                        placeholder="Ej: Juan Pérez"
                         value={formData.nombre}
                         onChange={handleChange}
-                        error={errors.nombre} // Pasamos el error al componente
+                        error={errors.nombre}
+                        maxLength={30}
                     />
 
                     <InputField
-                        label="Correo Electrónico"
+                        label="Correo Electrónico *"
                         name="email"
                         type="email"
-                        placeholder="ejemplo@gmail.com"
+                        placeholder="ejemplo@correo.com"
                         value={formData.email}
                         onChange={handleChange}
                         error={errors.email}
@@ -189,7 +174,7 @@ function RegisterPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InputField
-                            label="Contraseña"
+                            label="Contraseña *"
                             name="password"
                             type="password"
                             placeholder="Mínimo 6 caracteres"
@@ -198,7 +183,7 @@ function RegisterPage() {
                             error={errors.password}
                         />
                         <InputField
-                            label="Reingrese contraseña"
+                            label="Repetir contraseña *"
                             name="repass"
                             type="password"
                             placeholder="Repite tu contraseña"
@@ -207,30 +192,33 @@ function RegisterPage() {
                             error={errors.repass}
                         />
                     </div>
-                    <InputField
-                        label="Fecha de Nacimiento"
-                        name="fechaNacimiento"
-                        type="date"
-                        value={formData.fechaNacimiento}
-                        onChange={handleChange}
-                        max={today}
-                    />
-                    <InputField
-                        label="Código de Descuento (Opcional)"
-                        name="cupon"
-                        maxLength={20}
-                        type="text"
-                        placeholder="Ej: FELICES50"
-                        value={formData.cupon}
-                        onChange={handleChange}
-                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <InputField
+                            label="Fecha de Nacimiento"
+                            name="fechaNacimiento"
+                            type="date"
+                            max={today} // Bloquea futuro en el calendario
+                            value={formData.fechaNacimiento}
+                            onChange={handleChange}
+                            error={errors.fechaNacimiento}
+                        />
+                        <InputField
+                            label="Cupón (Opcional)"
+                            name="cupon"
+                            type="text"
+                            placeholder="Ej: FELICES50"
+                            value={formData.cupon}
+                            onChange={handleChange}
+                        />
+                    </div>
 
                     <Button
                         type="submit"
-                        className="w-full mt-4 bg-acento-rosa hover:bg-acento-rosa text-white"
+                        className="w-full mt-4 bg-red-500 hover:bg-red-600 text-white"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Registrando...' : 'Registrar'}
+                        {isLoading ? 'Creando cuenta...' : 'Registrar'}
                     </Button>
 
                 </form>
