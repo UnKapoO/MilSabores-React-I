@@ -6,7 +6,7 @@ import type { Product } from '../../types/Product';
 import { Breadcrumb } from '../../components/ui/common/Breadcrumb';
 import { ProductDetailView } from '../../components/ui/ProductDetailView';
 import { EmptyState } from '../../components/ui/common/EmptyState';
-import ProductCard from '../../components/ui/ProductCard'; // ¡Aquí importamos tu tarjeta nueva!
+import ProductCard from '../../components/ui/ProductCard';
 import { Modal } from '../../components/ui/common/Modal';
 import { Button } from '../../components/ui/common/Button';
 import { PersonalizationForm } from '../../components/ui/PersonalizationForm';
@@ -16,14 +16,12 @@ import { useCart } from '../../context/CartContext';
 import { formatearPrecio, getImageUrl } from '../../utils/formatters';
 import { API_BASE_URL } from '../../config/api';
 
-// Configuración del API
-const API_URL = '${API_BASE_URL}';
-
 function ProductDetailPage() {
     const params = useParams();
     const productId = params.id;
 
-    const { addToCart } = useCart();
+    // 1. Extraemos 'cart' (o cartItems) y 'addToast' para validar y notificar
+    const { addToCart, cart, addToast } = useCart(); 
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -34,20 +32,19 @@ function ProductDetailPage() {
     const [selectedCantidad, setSelectedCantidad] = useState(1); 
 
     useEffect(() => {
-        // Al cambiar de producto, subimos el scroll al inicio
         window.scrollTo(0, 0);
 
         const fetchProduct = async () => {
             setIsLoading(true);
             setRecomendados([]);
             try {
-                
-                // 1. Cargar Producto Principal
-                const response = await fetch(`${API_BASE_URL}/productos/${productId}`);                if (!response.ok) throw new Error('Producto no encontrado');
+                // Cargar Producto Principal
+                const response = await fetch(`${API_BASE_URL}/productos/${productId}`);
+                if (!response.ok) throw new Error('Producto no encontrado');
                 const data: Product = await response.json();
                 setProduct(data);
 
-                // 2. Cargar Recomendados (Misma categoría, excluyendo el actual)
+                // Cargar Recomendados
                 const relatedRes = await fetch(`${API_BASE_URL}/productos`);
                 const relatedData: Product[] = await relatedRes.json();
                 
@@ -66,9 +63,28 @@ function ProductDetailPage() {
         fetchProduct();
     }, [productId]); 
 
-    // --- MANEJO DE MODALES Y CARRITO ---
+    // --- MANEJO DE MODALES Y CARRITO CON VALIDACIÓN DE STOCK ---
     const handleAddToCartClick = (cantidad: number) => {
         if (!product) return; 
+        //undefined = 0
+        const currentStock = product.stock || 0;
+        // --- VALIDACIÓN 1: ¿Hay stock general? ---
+        if (currentStock <= 0) {
+            addToast("Lo sentimos, este producto está agotado.", "error");
+            return;
+        }
+
+        // --- VALIDACIÓN 2: ¿La suma (carrito + nuevo) supera el stock? ---
+        // Buscamos si este producto ya está en el carrito
+        const itemInCart = cart.find((item: any) => item.id === product.id);
+        const currentQtyInCart = itemInCart ? itemInCart.cantidad : 0;
+
+        if (currentQtyInCart + cantidad > currentStock) {
+            addToast(`Solo quedan ${currentStock} unidades disponibles (Ya tienes ${currentQtyInCart} en el carrito).`, "error");
+            return;
+        }
+
+        // Si pasa las validaciones, procedemos normal
         setSelectedCantidad(cantidad); 
         const categoriasEspeciales = ["tortas-cuadradas", "tortas-circulares", "especiales"];
 
@@ -147,8 +163,8 @@ function ProductDetailPage() {
                                 <ProductCard
                                     key={recommendedProduct.id}
                                     product={recommendedProduct}
-                                    // Pasamos la función simple para agregar 1 unidad
-                                    onAddToCartClick={() => addToCart(recommendedProduct, 1)} 
+                                    // Aquí también validamos al hacer clic directo
+                                    onAddToCartClick={() => handleAddToCartClick(1)} 
                                 />
                             ))}
                         </div>
@@ -165,11 +181,20 @@ function ProductDetailPage() {
                 {product && (
                     <div className="bg-fondo-crema -m-6 p-6">
                         <div className="flex gap-4 items-center p-4 bg-white rounded-lg mb-4">
-                            <img 
-                                src={getImageUrl(product.imagen)} 
-                                alt={product.nombre} 
-                                className="w-20 h-20 rounded-md object-cover" 
-                            />
+                            {/* IMAGEN SEGURA USANDO getImageUrl Y MANEJO DE ERROR */}
+                            <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
+                                <img 
+                                    src={getImageUrl(product.imagen)} 
+                                    alt={product.nombre} 
+                                    className="w-full h-full object-cover" 
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                    }}
+                                />
+                                <i className="fa-solid fa-cake-candles text-gray-400 text-2xl hidden"></i>
+                            </div>
+                            
                             <div>
                                 <h4 className="font-bold text-lg text-dark">{product.nombre}</h4>
                                 <p className="text-primary font-bold">{formatearPrecio(product.precio)}</p>

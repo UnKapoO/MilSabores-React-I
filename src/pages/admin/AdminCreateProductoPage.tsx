@@ -55,7 +55,6 @@ const AdminCreateProductoPage = () => {
 
   const [formData, setFormData] = useState<FormDataType>(initialFormState);
   const [isLoading, setIsLoading] = useState(!!productId);
-  const [imageResetKey, setImageResetKey] = useState(0);
 
   // --- CARGA DE DATOS (Edición) ---
   useEffect(() => {
@@ -73,7 +72,6 @@ const AdminCreateProductoPage = () => {
           ...data,
           imagenUrl: data.imagen || '',
           imagenFile: null,
-          // Mapeo inteligente: Si viene 'sku' (Java) úsalo, si no usa 'codigo' (json-server)
           codigo: data.sku || data.codigo || '',
         });
       } catch (error) {
@@ -88,12 +86,14 @@ const AdminCreateProductoPage = () => {
   }, [productId, addToast]);
 
   // --- MANEJADORES ---
+  
+  // Este manejador es genérico para Inputs, Selects y TextAreas
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     
-    // ARREGLO: Si es número y está vacío, pon 0 o cadena vacía, no NaN
     let finalValue: string | number = value;
 
+    // Si es un input numérico, convertimos a número (o string vacío si no hay nada)
     if (type === 'number') {
         finalValue = value === '' ? '' : parseFloat(value);
     }
@@ -108,12 +108,14 @@ const AdminCreateProductoPage = () => {
   // Helper para mostrar la imagen correcta (Backend o Local)
   const getPreviewUrl = () => {
     if (!formData.imagenUrl) return undefined;
+    // Si ya trae http (externa) o data: (base64) la usamos tal cual
     if (formData.imagenUrl.startsWith('http') || formData.imagenUrl.startsWith('data:')) return formData.imagenUrl;
-    // Concatenamos la base URL si es una imagen del servidor
+    
+    // Si es una ruta relativa (ej: media/foto.jpg), le pegamos la URL del backend
     return `${API_BASE_URL}/${formData.imagenUrl}`;
   };
 
-  // --- LÓGICA DE ENVÍO (MEZCLADA: FormData + Validaciones tuyas) ---
+  // --- LÓGICA DE ENVÍO ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -121,7 +123,8 @@ const AdminCreateProductoPage = () => {
     try {
         let finalImageUrl = formData.imagenUrl;
 
-        // 1. SUBIDA DE IMAGEN (Lógica de ella para Spring Boot)
+        // 1. SUBIDA DE IMAGEN (Multipart Form Data)
+        // Solo subimos si el usuario seleccionó un archivo nuevo
         if (formData.imagenFile) {
             const uploadData = new FormData();
             uploadData.append('file', formData.imagenFile);
@@ -134,26 +137,26 @@ const AdminCreateProductoPage = () => {
             if (!uploadRes.ok) throw new Error('Error al subir la imagen al servidor');
             
             const responseData = await uploadRes.json();
-            finalImageUrl = responseData.url; // La URL que devuelve el backend
+            finalImageUrl = responseData.url; 
         }
 
-        // 2. PREPARAR DATOS
+        // 2. PREPARAR DATOS DEL PRODUCTO
         const dataToSend = {
             nombre: formData.nombre,
             descripcion: formData.descripcion,
             historia: formData.historia,
-            sku: formData.codigo, // Enviamos 'sku' para el backend nuevo
-            codigo: formData.codigo, // Mantenemos 'codigo' por compatibilidad
+            sku: formData.codigo, 
+            codigo: formData.codigo,
             categoria: formData.categoria,
             estado: formData.estado,
             precio: Number(formData.precio),
             descuento: Number(formData.descuento),
             stock: Number(formData.stock),
-            imagen: finalImageUrl,
+            imagen: finalImageUrl, // Enviamos la URL final (string)
         };
 
         // 3. GUARDAR EN BD
-        const method = productId ? 'PUT' : 'POST'; // Java suele usar PUT para updates completos
+        const method = productId ? 'PUT' : 'POST';
         const url = productId ? `${API_URL}/${productId}` : API_URL;
 
         const response = await fetch(url, {
@@ -164,16 +167,14 @@ const AdminCreateProductoPage = () => {
 
         if (!response.ok) throw new Error(`Error al guardar: ${response.status}`);
 
-        // 4. FEEDBACK (Tu UX)
+        // 4. FEEDBACK Y REDIRECCIÓN
         const successMessage = productId ? 'actualizado' : 'creado';
-        addToast(`Producto ${successMessage} con éxito!`, "success");
-        
-        // Redirigir
+        addToast(`¡Producto ${successMessage} con éxito!`, "success");
         navigate('/admin/productos');
 
     } catch (error) {
         console.error("Fallo al guardar:", error);
-        addToast("Error al guardar. Revisa la conexión.", "error");
+        addToast("Error al guardar. Revisa la consola.", "error");
     } finally {
         setIsLoading(false);
     }
@@ -193,7 +194,7 @@ const AdminCreateProductoPage = () => {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Columna 1 y 2 */}
+          {/* Columna 1 y 2: Datos del formulario */}
           <div className="lg:col-span-2 space-y-6">
             <FormPanel title="Información Principal del Producto">
               <InputField
@@ -202,11 +203,17 @@ const AdminCreateProductoPage = () => {
               
               <TextAreaField
                 label="Descripción" name="descripcion" placeholder="Describe el producto..."
-                value={formData.descripcion} onChange={handleChange as any} rows={4} />
+                value={formData.descripcion} 
+                // CORRECCIÓN DE TIPO: Casteamos el evento específicamente
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLTextAreaElement>)} 
+                rows={4} />
               
               <TextAreaField
                 label="Historia" name="historia" placeholder="Historia del producto"
-                value={formData.historia} onChange={handleChange as any} rows={2} />
+                value={formData.historia} 
+                // CORRECCIÓN DE TIPO
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLTextAreaElement>)} 
+                rows={2} />
             </FormPanel>
 
             <FormPanel title="Precio y Stock">
@@ -224,7 +231,7 @@ const AdminCreateProductoPage = () => {
             </FormPanel>
           </div>
 
-          {/* Columna 3 */}
+          {/* Columna 3: Configuración e Imagen */}
           <div className="lg:col-span-1 space-y-6">
             <FormPanel title="Organización">
               <InputField
@@ -233,21 +240,22 @@ const AdminCreateProductoPage = () => {
 
               <SelectField
                 label="Categoría" name="categoria" value={formData.categoria}
-                onChange={handleChange as any} options={categoriasOptions} />
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)} 
+                options={categoriasOptions} />
 
               <SelectField
                 label="Estado" name="estado" value={formData.estado}
-                onChange={handleChange as any} options={estadoOptions} />
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)} 
+                options={estadoOptions} />
             </FormPanel>
 
             <FormPanel title="Imagen del Producto">
               <ImageUploader 
-                key={imageResetKey} 
                 onImageSelect={handleImageSelect}
                 initialPreviewUrl={getPreviewUrl()}
               />
               <p className="text-xs text-gray-400 mt-2">
-                * La imagen se subirá al servidor al guardar.
+                * La imagen se subirá al servidor automáticamente al guardar.
               </p>
             </FormPanel>
           </div>

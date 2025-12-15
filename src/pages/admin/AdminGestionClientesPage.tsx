@@ -87,6 +87,7 @@ const AdminGestionClientesPage = () => {
                 setUsers(prev => prev.map(u => u.id === userToEdit.id ? { ...u, rol: newRole } : u));
             }
         } catch (error) {
+            console.error(error);
             alert("Error al actualizar rol.");
         }
     };

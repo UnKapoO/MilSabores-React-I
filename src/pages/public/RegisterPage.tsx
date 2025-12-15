@@ -27,8 +27,12 @@ function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    // --- Fecha máxima (Hoy) para el input de nacimiento ---
-    const today = new Date().toISOString().split('T')[0];
+    // Lógica para fechas
+    const today = new Date();
+    // Mínimo 13 años para registrarse
+    const maxDate = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate()).toISOString().split('T')[0];
+    // Máximo 120 años
+    const minDate = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()).toISOString().split('T')[0];
 
     // --- Manejador de Cambios ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,10 +77,31 @@ function RegisterPage() {
         }
 
         // 5. Validar Fecha (No futuro)
-        if (formData.fechaNacimiento && formData.fechaNacimiento > today) {
-            newErrors.fechaNacimiento = "La fecha no puede ser futura.";
-        }
+        // 5. Validar Fecha de Nacimiento
+        if (!formData.fechaNacimiento) {
+            newErrors.fechaNacimiento = "La fecha de nacimiento es obligatoria.";
+        } else {
+            const fechaNac = new Date(formData.fechaNacimiento);
+            const hoy = new Date();
 
+            // Calculamos la edad exacta
+            let edad = hoy.getFullYear() - fechaNac.getFullYear();
+            const mes = hoy.getMonth() - fechaNac.getMonth();
+            
+            // Ajustamos si aún no ha cumplido años en el mes actual
+            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+
+            // Validaciones
+            if (fechaNac > hoy) {
+                newErrors.fechaNacimiento = "La fecha no puede ser futura.";
+            } else if (edad < 13) {
+                newErrors.fechaNacimiento = "Debes tener al menos 13 años para registrarte.";
+            } else if (edad > 120) {
+                newErrors.fechaNacimiento = "Por favor ingresa un año de nacimiento válido.";
+            }
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -198,7 +223,8 @@ function RegisterPage() {
                             label="Fecha de Nacimiento"
                             name="fechaNacimiento"
                             type="date"
-                            max={today} // Bloquea futuro en el calendario
+                            max={maxDate}
+                            min={minDate} 
                             value={formData.fechaNacimiento}
                             onChange={handleChange}
                             error={errors.fechaNacimiento}

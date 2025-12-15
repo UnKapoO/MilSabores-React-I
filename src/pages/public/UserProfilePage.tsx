@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/common/Button';
+import { InputField } from '../../components/ui/common/InputField'; 
+import { Modal } from '../../components/ui/common/Modal'; 
 import { formatearPrecio, formatearFecha } from '../../utils/formatters';
-import { API_BASE_URL } from '../../config/api'; // Importar configuración
+import { API_BASE_URL } from '../../config/api';
 
-// Definimos la forma de un Pedido (Compatible con Java y JSON-Server)
+// Definimos la forma de un Pedido
 interface Order {
     id: string | number;
-    fecha?: string;        // JSON-Server (viejo)
-    fechaCreacion?: string; // Spring Boot (nuevo)
+    fecha?: string;
+    fechaCreacion?: string;
     total: number;
     estado: string;
     items: { nombre: string; cantidad: number; precio: number }[];
@@ -18,39 +20,42 @@ interface Order {
 function UserProfilePage() {
     const { user, logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    
+    // Estados para Historial
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // 1. Protección: Si no hay usuario, al login
+    // Estados para Edición de Perfil 
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [editFormData, setEditFormData] = useState({
+        nombre: '',
+        telefono: ''
+    });
+
+    // 1. Protección
     useEffect(() => {
         if (!isAuthenticated) {
             navigate('/login');
         }
     }, [isAuthenticated, navigate]);
 
-    // 2. Cargar historial de pedidos
+    // 2. Cargar historial
     useEffect(() => {
         if (!user || !user.email) return;
 
         const fetchOrders = async () => {
             setIsLoading(true);
             try {
-                // Buscamos pedidos por el email del usuario
-                // Spring Boot debe tener un endpoint: /pedidos?userId=...
                 const response = await fetch(`${API_BASE_URL}/pedidos?userId=${user.email}`);
-
                 if (!response.ok) throw new Error("Error al cargar historial");
-
                 const data = await response.json();
 
-                // Ordenamos por fecha (del más reciente al más antiguo)
-                // Manejamos ambas propiedades de fecha
                 const sortedData = data.sort((a: any, b: any) => {
                     const dateA = new Date(a.fechaCreacion || a.fecha).getTime();
                     const dateB = new Date(b.fechaCreacion || b.fecha).getTime();
                     return dateB - dateA;
                 });
-
                 setOrders(sortedData);
             } catch (error) {
                 console.error("Error cargando pedidos:", error);
@@ -58,9 +63,49 @@ function UserProfilePage() {
                 setIsLoading(false);
             }
         };
-
         fetchOrders();
     }, [user]);
+
+    //Funciones para Editar Perfil
+    
+    const openEditModal = () => {
+        if (user) {
+            // Pre-llenamos el formulario con los datos actuales
+            setEditFormData({
+                nombre: user.nombre || '',
+                telefono: (user as any).telefono || ''
+            });
+            setIsEditModalOpen(true);
+        }
+    };
+
+    const handleUpdateProfile = async () => {
+        if (!user) return;
+        setIsUpdating(true);
+
+        try {
+            // Enviamos PATCH para actualizar solo los campos cambiados
+            const response = await fetch(`${API_BASE_URL}/usuarios/${user.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editFormData)
+            });
+
+            if (response.ok) {
+                alert("¡Perfil actualizado con éxito!");
+                setIsEditModalOpen(false);
+                // Recargamos para ver los cambios reflejados (especialmente en el header/nombre)
+                window.location.reload(); 
+            } else {
+                throw new Error("Error al actualizar");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("No se pudo actualizar el perfil.");
+        } finally {
+            setIsUpdating(false);
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -71,7 +116,6 @@ function UserProfilePage() {
 
     return (
         <div className="container mx-auto py-12 px-4 bg-fondo-crema min-h-screen">
-
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                 {/* BARRA LATERAL */}
@@ -84,7 +128,12 @@ function UserProfilePage() {
                         <p className="text-letra-cafe text-sm mb-6">{user.email}</p>
 
                         <div className="space-y-3">
-                            {/* Si es admin, mostramos botón al panel */}
+                            {/* --- NUEVO: Botón Editar Perfil --- */}
+                            <Button variant="outline" onClick={openEditModal} className="w-full">
+                                <i className="fa-solid fa-pen-to-square mr-2"></i>
+                                Editar Mis Datos
+                            </Button>
+
                             {user.rol === 'admin' && (
                                 <Button variant="secondary" onClick={() => navigate('/admin')} className="w-full">
                                     <i className="fa-solid fa-chart-line mr-2"></i>
@@ -126,16 +175,15 @@ function UserProfilePage() {
                                             <div className="flex items-center gap-3">
                                                 <span className="font-bold text-primary text-lg">Pedido #{order.id}</span>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border
-                                ${order.estado === 'entregado' ? 'bg-green-100 text-green-700 border-green-200' :
+                                                    ${order.estado === 'entregado' ? 'bg-green-100 text-green-700 border-green-200' :
                                                         order.estado === 'cancelado' ? 'bg-red-100 text-red-700 border-red-200' :
                                                             'bg-amber-100 text-amber-700 border-amber-200'}
-                            `}>
+                                                `}>
                                                     {order.estado}
                                                 </span>
                                             </div>
                                             <p className="text-sm text-gray-500 mt-1">
                                                 <i className="fa-regular fa-calendar mr-2"></i>
-                                                {/* Usamos la fecha que exista */}
                                                 {formatearFecha(order.fechaCreacion || order.fecha || '')}
                                             </p>
                                         </div>
@@ -147,7 +195,6 @@ function UserProfilePage() {
                                         </div>
                                     </div>
 
-                                    {/* Lista de items */}
                                     <div className="bg-gray-50 rounded-md p-3">
                                         <ul className="text-sm text-letra-cafe space-y-2">
                                             {order.items.map((item, i) => (
@@ -166,6 +213,41 @@ function UserProfilePage() {
                     )}
                 </div>
             </div>
+
+            {/* --- NUEVO: Modal de Edición --- */}
+            <Modal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                title="Editar Mis Datos"
+            >
+                <div className="space-y-4">
+                    <InputField
+                        label="Nombre Completo"
+                        name="nombre"
+                        type="text"
+                        value={editFormData.nombre}
+                        onChange={(e) => setEditFormData({ ...editFormData, nombre: e.target.value })}
+                    />
+                    
+                    <InputField
+                        label="Teléfono"
+                        name="telefono"
+                        type="tel"
+                        placeholder="+56 9..."
+                        value={editFormData.telefono}
+                        onChange={(e) => setEditFormData({ ...editFormData, telefono: e.target.value })}
+                    />
+
+                    <div className="flex justify-end gap-2 mt-6">
+                        <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button variant="primary" onClick={handleUpdateProfile} disabled={isUpdating}>
+                            {isUpdating ? 'Guardando...' : 'Guardar Cambios'}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }
