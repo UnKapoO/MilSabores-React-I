@@ -166,7 +166,7 @@ function RegisterPage() {
     };
 
     return (
-        <div className="container mx-auto py-12 px-4 flex justify-center">
+        <div className="container mx-auto bg-fondo-crema py-12 px-4 flex justify-center">
             <AuthCard
                 title="Crear Cuenta"
                 subtitle="Únete a la comunidad de Mil Sabores"

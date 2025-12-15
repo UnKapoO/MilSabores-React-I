@@ -16,13 +16,17 @@ import { formatearPrecio } from '../../utils/formatters';
 import { useCart } from '../../context/CartContext';
 import type { Product } from '../../types/Product';
 import { obtenerNombreCategoria } from '../../utils/formatters';
-import { API_BASE_URL } from '../../config/api'; // Importamos la config de ella
+import { API_BASE_URL } from '../../config/api'; 
 
-// Función helper para imágenes (la de ella)
+// Función helper para imágenes 
 const getImageUrl = (imagenPath: string | undefined | null) => {
     if (!imagenPath) return 'https://via.placeholder.com/150?text=Sin+Imagen';
+    
     if (imagenPath.startsWith('http') || imagenPath.startsWith('data:')) return imagenPath;
-    return `${API_BASE_URL}/${imagenPath}`;
+    
+    const pathLimpio = imagenPath.startsWith('/') ? imagenPath : `/${imagenPath}`;
+    
+    return pathLimpio; 
 };
 
 const breadcrumbLinks = [

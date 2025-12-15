@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 import { Button } from '../../components/ui/common/Button';
-import { InputField } from '../../components/ui/common/InputField'; 
-import { Modal } from '../../components/ui/common/Modal'; 
+import { InputField } from '../../components/ui/common/InputField';
+import { Modal } from '../../components/ui/common/Modal';
 import { formatearPrecio, formatearFecha } from '../../utils/formatters';
 import { API_BASE_URL } from '../../config/api';
 
@@ -20,7 +21,8 @@ interface Order {
 function UserProfilePage() {
     const { user, logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();
-    
+    // 2. Usamos el hook para los toasts
+    const { addToast } = useCart();
     // Estados para Historial
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -67,10 +69,9 @@ function UserProfilePage() {
     }, [user]);
 
     //Funciones para Editar Perfil
-    
+
     const openEditModal = () => {
         if (user) {
-            // Pre-llenamos el formulario con los datos actuales
             setEditFormData({
                 nombre: user.nombre || '',
                 telefono: (user as any).telefono || ''
@@ -78,11 +79,25 @@ function UserProfilePage() {
             setIsEditModalOpen(true);
         }
     };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
 
+        if (name === 'telefono') {
+            // Solo permite números y limita a 9 caracteres
+            const soloNumeros = value.replace(/\D/g, '').slice(0, 9);
+            setEditFormData(prev => ({ ...prev, [name]: soloNumeros }));
+        } else {
+            // Para nombre, comportamiento normal
+            setEditFormData(prev => ({ ...prev, [name]: value }));
+        }
+    };
     const handleUpdateProfile = async () => {
         if (!user) return;
         setIsUpdating(true);
-
+        if (!editFormData.nombre.trim() || editFormData.telefono.length < 8) {
+            addToast("Por favor completa el nombre y un teléfono válido.", "error");
+            return;
+        }
         try {
             // Enviamos PATCH para actualizar solo los campos cambiados
             const response = await fetch(`${API_BASE_URL}/usuarios/${user.id}`, {
@@ -92,16 +107,16 @@ function UserProfilePage() {
             });
 
             if (response.ok) {
-                alert("¡Perfil actualizado con éxito!");
+                addToast("¡Perfil actualizado con éxito!", "success");
                 setIsEditModalOpen(false);
                 // Recargamos para ver los cambios reflejados (especialmente en el header/nombre)
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 throw new Error("Error al actualizar");
             }
         } catch (error) {
             console.error(error);
-            alert("No se pudo actualizar el perfil.");
+            addToast("No se pudo actualizar el perfil.", "error");
         } finally {
             setIsUpdating(false);
         }
@@ -128,7 +143,6 @@ function UserProfilePage() {
                         <p className="text-letra-cafe text-sm mb-6">{user.email}</p>
 
                         <div className="space-y-3">
-                            {/* --- NUEVO: Botón Editar Perfil --- */}
                             <Button variant="outline" onClick={openEditModal} className="w-full">
                                 <i className="fa-solid fa-pen-to-square mr-2"></i>
                                 Editar Mis Datos
@@ -226,16 +240,17 @@ function UserProfilePage() {
                         name="nombre"
                         type="text"
                         value={editFormData.nombre}
-                        onChange={(e) => setEditFormData({ ...editFormData, nombre: e.target.value })}
+                        onChange={handleInputChange}
                     />
-                    
+
                     <InputField
                         label="Teléfono"
                         name="telefono"
                         type="tel"
                         placeholder="+56 9..."
                         value={editFormData.telefono}
-                        onChange={(e) => setEditFormData({ ...editFormData, telefono: e.target.value })}
+                        onChange={handleInputChange} 
+                        maxLength={9} 
                     />
 
                     <div className="flex justify-end gap-2 mt-6">

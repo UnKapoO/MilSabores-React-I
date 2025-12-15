@@ -21,7 +21,7 @@ function ProductDetailPage() {
     const productId = params.id;
 
     // 1. Extraemos 'cart' (o cartItems) y 'addToast' para validar y notificar
-    const { addToCart, cart, addToast } = useCart(); 
+    const { addToCart, cart, addToast } = useCart();
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +29,7 @@ function ProductDetailPage() {
 
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isPersonalizeModalOpen, setIsPersonalizeModalOpen] = useState(false);
-    const [selectedCantidad, setSelectedCantidad] = useState(1); 
+    const [selectedCantidad, setSelectedCantidad] = useState(1);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -47,11 +47,11 @@ function ProductDetailPage() {
                 // Cargar Recomendados
                 const relatedRes = await fetch(`${API_BASE_URL}/productos`);
                 const relatedData: Product[] = await relatedRes.json();
-                
+
                 const filteredRecomendados = relatedData
                     .filter(p => p.categoria === data.categoria && p.id !== data.id)
                     .slice(0, 4);
-                
+
                 setRecomendados(filteredRecomendados);
             } catch (error) {
                 console.error(error);
@@ -61,11 +61,11 @@ function ProductDetailPage() {
             }
         };
         fetchProduct();
-    }, [productId]); 
+    }, [productId]);
 
     // --- MANEJO DE MODALES Y CARRITO CON VALIDACIÓN DE STOCK ---
     const handleAddToCartClick = (cantidad: number) => {
-        if (!product) return; 
+        if (!product) return;
         //undefined = 0
         const currentStock = product.stock || 0;
         // --- VALIDACIÓN 1: ¿Hay stock general? ---
@@ -85,7 +85,7 @@ function ProductDetailPage() {
         }
 
         // Si pasa las validaciones, procedemos normal
-        setSelectedCantidad(cantidad); 
+        setSelectedCantidad(cantidad);
         const categoriasEspeciales = ["tortas-cuadradas", "tortas-circulares", "especiales"];
 
         if (product.personalizable || categoriasEspeciales.includes(product.categoria)) {
@@ -112,7 +112,7 @@ function ProductDetailPage() {
                 precio: precioFinal,
                 nombre: `${product.nombre} (Personalizado)`,
             };
-            addToCart(customizedProduct, selectedCantidad, personalizacion); 
+            addToCart(customizedProduct, selectedCantidad, personalizacion);
         }
         closeAllModals();
     };
@@ -120,7 +120,7 @@ function ProductDetailPage() {
     const closeAllModals = () => {
         setIsConfirmModalOpen(false);
         setIsPersonalizeModalOpen(false);
-        setSelectedCantidad(1); 
+        setSelectedCantidad(1);
     };
 
     return (
@@ -134,8 +134,8 @@ function ProductDetailPage() {
                 <div className="mt-8">
                     {isLoading ? (
                         <div className="text-center py-20">
-                             <i className="fa-solid fa-spinner fa-spin text-4xl text-acento-rosa"></i>
-                             <p className="text-gray-500 mt-4">Horneando detalles...</p>
+                            <i className="fa-solid fa-spinner fa-spin text-4xl text-acento-rosa"></i>
+                            <p className="text-gray-500 mt-4">Horneando detalles...</p>
                         </div>
                     ) : product ? (
                         <ProductDetailView
@@ -164,7 +164,7 @@ function ProductDetailPage() {
                                     key={recommendedProduct.id}
                                     product={recommendedProduct}
                                     // Aquí también validamos al hacer clic directo
-                                    onAddToCartClick={() => handleAddToCartClick(1)} 
+                                    onAddToCartClick={() => handleAddToCartClick(1)}
                                 />
                             ))}
                         </div>
@@ -183,10 +183,9 @@ function ProductDetailPage() {
                         <div className="flex gap-4 items-center p-4 bg-white rounded-lg mb-4">
                             {/* IMAGEN SEGURA USANDO getImageUrl Y MANEJO DE ERROR */}
                             <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200 flex items-center justify-center">
-                                <img 
-                                    src={getImageUrl(product.imagen)} 
-                                    alt={product.nombre} 
-                                    className="w-full h-full object-cover" 
+                                <img
+                                    src={product.imagen.startsWith('http') ? product.imagen : `/img/${product.imagen.split('/').pop()}`} alt={product.nombre}
+                                    className="w-full h-full object-cover"
                                     onError={(e) => {
                                         e.currentTarget.style.display = 'none';
                                         e.currentTarget.nextElementSibling?.classList.remove('hidden');
@@ -194,7 +193,7 @@ function ProductDetailPage() {
                                 />
                                 <i className="fa-solid fa-cake-candles text-gray-400 text-2xl hidden"></i>
                             </div>
-                            
+
                             <div>
                                 <h4 className="font-bold text-lg text-dark">{product.nombre}</h4>
                                 <p className="text-primary font-bold">{formatearPrecio(product.precio)}</p>
