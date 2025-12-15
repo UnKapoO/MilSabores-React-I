@@ -28,7 +28,27 @@ function CarritoPage() {
     const subtotal = cart.reduce((total, item) => total + (item.precio * item.cantidad), 0);
     const envio = subtotal > 0 ? 3000 : 0;
     const total = (subtotal + envio) - descuento;
+    //Función Intermediaria para Validar Stock ---
+    const handleUpdateCantidad = (id: number, nuevaCantidad: number) => {
+        // 1. Buscamos el producto en el carrito para saber su stock real
+        const item = cart.find(i => i.id === id);
 
+        if (!item) return;
+
+        // 2. Si la nueva cantidad es mayor a la actual (está intentando sumar)
+        if (nuevaCantidad > item.cantidad) {
+            const stockMaximo = item.stock || 0; // Usamos 0 si viene undefined
+
+            // 3. Si intenta superar el stock, bloqueamos y avisamos
+            if (nuevaCantidad > stockMaximo) {
+                addToast(`Solo quedan ${stockMaximo} unidades disponibles.`, 'error');
+                return;
+            }
+        }
+
+        // 4. Si pasó la validación (o si está restando), llamamos a la función real
+        updateCantidad(id, nuevaCantidad);
+    };
     const handleApplyPromo = () => {
         // 1. Limpiamos el input (mayúsculas y espacios)
         const codigoIngresado = promoCode.trim().toUpperCase();
@@ -40,9 +60,9 @@ function CarritoPage() {
 
         // Caso B: Validación Estricta (Código Incorrecto)
         if (!cupones_validos.includes(codigoIngresado)) {
-            addToast('El cupón no es válido.', 'error'); 
-            setDescuento(0); 
-            setPromoCode(''); 
+            addToast('El cupón no es válido.', 'error');
+            setDescuento(0);
+            setPromoCode('');
             return;
         }
 
@@ -58,14 +78,14 @@ function CarritoPage() {
         }
 
         setDescuento(nuevoDescuento);
-        setPromoCode(''); 
+        setPromoCode('');
     };
     const handleCheckout = () => {
         navigate('/checkout');
     };
 
     return (
-        <div className="container mx-auto py-12 px-4">
+        <div className="container mx-auto bg-fondo-crema py-12 px-4">
             <Breadcrumb links={breadcrumbLinks} currentPage="Carrito" />
             <PageHeader
                 title="Mi Carrito de Compras"
@@ -99,7 +119,7 @@ function CarritoPage() {
                                     key={item.id}
                                     item={item}
                                     onRemove={removeFromCart}
-                                    onUpdateCantidad={updateCantidad}
+                                    onUpdateCantidad={handleUpdateCantidad}
                                 />
                             ))}
                         </div>

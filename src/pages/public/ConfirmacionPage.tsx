@@ -10,7 +10,7 @@ function ConfirmacionPage() {
 
     if (!orden) {
         return (
-            <div className="container mx-auto py-20 px-4 text-center">
+            <div className="container bg-fondo-crema mx-auto py-20 px-4 text-center">
                 <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md border border-gray-200">
                     <i className="fa-solid fa-circle-exclamation text-5xl text-red-500 mb-4"></i>
                     <h1 className="text-2xl font-bold text-dark mb-2">No se encontró el pedido</h1>
@@ -27,7 +27,7 @@ function ConfirmacionPage() {
     }
 
     return (
-        <div className="container mx-auto py-12 px-4">
+        <div className="container bg-fondo-crema mx-auto py-12 px-4">
             {/* 3. Renderizamos la tarjeta con los datos reales de la orden */}
             <OrderSuccessCard orden={orden} />
         </div>

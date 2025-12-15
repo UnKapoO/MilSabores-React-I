@@ -1,76 +1,49 @@
-import { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useCart } from '../../../context/CartContext';
 
 function NotificationToast() {
-    // 1. Lee el toast (singular) del "cerebro"
+    // 1. Solo leemos el estado.
     const { toastNotification } = useCart();
 
-    // 2. Estados locales para controlar la animación y el contenido
-    const [isVisible, setIsVisible] = useState(false);
-    const [currentMessage, setCurrentMessage] = useState('');
-    const [currentType, setCurrentType] = useState<'success' | 'info' | 'error'>('info');
+    // 2. Si es null, no renderizamos nada.
+    if (!toastNotification) return null;
 
-    const timerRef = useRef<number | null>(null); // Ref para el timer de reemplazo
-
-    useEffect(() => {
-        if (toastNotification) {
-            // Si llega un toast nuevo...
-            // 1. Inicia el "fade out apresurado" (si ya había uno)
-            setIsVisible(false);
-
-            // 2. Limpia cualquier timer de "fade-in" anterior
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-
-            // 3. Espera 150ms (para que el fade-out se vea) y luego cambia el contenido
-            timerRef.current = window.setTimeout(() => {
-                setCurrentMessage(toastNotification.message);
-                setCurrentType(toastNotification.type);
-                setIsVisible(true); // 4. Inicia el fade-in
-            }, 150); // 150ms es un buen tiempo de "reemplazo"
-
-        } else {
-            // Si el context borra el toast (después de 3s), solo haz fade-out
-            setIsVisible(false);
-        }
-
-        // Limpieza al desmontar el componente
-        return () => {
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-        };
-    }, [toastNotification]); // Reacciona al 'toastNotification' del cerebro
-
-    // Lógica de estilos
+    // 3. Estilos dinámicos
     let bgColor = 'bg-acento-cafe';
     let icon = 'fa-info-circle';
-    if (currentType === 'success') {
+    
+    if (toastNotification.type === 'success') {
         bgColor = 'bg-green-600';
         icon = 'fa-check-circle';
-    } else if (currentType === 'error') {
+    } else if (toastNotification.type === 'error') {
         bgColor = 'bg-red-600';
         icon = 'fa-exclamation-circle';
     }
 
     return (
-        <div
+        <div 
+            
+            key={toastNotification.id}
             className={`
-        fixed top-32 right-6 z-[100] py-3 px-6 rounded-lg shadow-lg 
-        flex items-center gap-3 text-white
-        transition-all duration-300 ease-in-out
-        ${bgColor}
-        ${isVisible
-                    ? 'opacity-100 translate-x-0' // Estado Visible (Fade-in)
-                    : 'opacity-0 translate-x-full' // Estado Oculto (Fade-out)
-                }
-                `}
-            // Ponemos un 'key' que cambia para forzar el reinicio de la animación si es necesario
-            key={toastNotification?.id || 'empty'}
+                fixed top-32 right-6 z-[100] py-3 px-6 rounded-lg shadow-lg 
+                flex items-center gap-3 text-white
+                animate-fade-in-down  
+                ${bgColor}
+            `}
         >
             <i className={`fa-solid ${icon}`}></i>
-            <span className="font-bold">{currentMessage}</span>
+            <span className="font-bold">{toastNotification.message}</span>
+            
+            {/* Animación CSS simple (Agrégala a tu index.css si no existe) */}
+            <style>{`
+                @keyframes fadeInDown {
+                    from { opacity: 0; transform: translateY(-20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-down {
+                    animation: fadeInDown 0.3s ease-out forwards;
+                }
+            `}</style>
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext'; // <-- 1. IMPORTAMOS AUTH
@@ -47,9 +47,11 @@ function CheckoutPage() {
     maxDateObj.setMonth(maxDateObj.getMonth() + 1);
     const maxDate = getLocalDateString(maxDateObj);
 
+    const isPurchaseComplete = useRef(false);
+
     // Protección: Si el carrito está vacío, volver al catálogo
     useEffect(() => {
-        if (cart.length === 0) {
+        if (cart.length === 0 && !isPurchaseComplete.current) {
             navigate('/catalogo');
             addToast("Tu carrito está vacío, agrega productos primero.", "info");
         }
@@ -160,18 +162,20 @@ function CheckoutPage() {
             }
 
             const savedOrder = await response.json();
+            isPurchaseComplete.current = true;
             clearCart();
             // 5. NAVEGACIÓN EXITOSA
             navigate('/confirmacion', { state: { orden: savedOrder } });
 
         } catch (error: any) {
             console.error("Error al procesar el pedido:", error);
+            isPurchaseComplete.current = false;
             addToast(error.message || "Hubo un problema al procesar tu pedido. Inténtalo nuevamente.", "error");
         }
     };
 
     return (
-        <div className="container mx-auto py-12 px-4">
+        <div className="container bg-fondo-crema mx-auto py-12 px-4">
             <Breadcrumb links={breadcrumbLinks} currentPage="Checkout" />
             <PageHeader title="Finalizar Compra" subtitle="Completa tu pedido de manera segura" />
 
