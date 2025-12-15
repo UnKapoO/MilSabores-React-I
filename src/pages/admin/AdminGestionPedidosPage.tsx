@@ -44,20 +44,35 @@ const AdminGestionPedidosPage = () => {
 
             const rawData = await response.json();
 
-            // --- CORRECCIÓN DE MAPEO ---
+            // --- CORRECCIÓN DE MAPEO PARA BACKEND JAVA ---
             const mappedOrders: Order[] = rawData.map((item: any) => {
                 // 1. Normalizar Fecha
                 const rawDate = item.fecha || item.fechaCreacion || new Date().toISOString();
 
-                // 2. Normalizar Cliente (Evitar [object Object])
+                // 2. Normalizar Cliente (Java devuelve clienteNombre plano)
                 let nombreCliente = 'Anónimo';
+                
+                // Prioridad 1: Objeto anidado (si usaras JSON Server o Mongo)
                 if (item.cliente && typeof item.cliente === 'object' && item.cliente.nombre) {
                     nombreCliente = item.cliente.nombre;
-                } else if (typeof item.cliente === 'string') {
-                    nombreCliente = item.cliente;
-                } else if (item.userId) {
+                } 
+                // Prioridad 2: Campos planos de Java (LO QUE USAS AHORA)
+                else if (item.clienteNombre) {
+                    nombreCliente = item.clienteNombre;
+                }
+                // Prioridad 3: ID de usuario
+                else if (item.userId) {
                     nombreCliente = item.userId;
                 }
+
+                // 3. Reconstruir objeto cliente completo para el modal
+                const clienteCompleto = item.cliente && typeof item.cliente === 'object' ? item.cliente : {
+                    nombre: item.clienteNombre,
+                    email: item.clienteEmail,
+                    telefono: item.clienteTelefono,
+                    direccion: item.clienteDireccion,
+                    comuna: item.clienteComuna
+                };
 
                 return {
                     id: item.id,
@@ -69,7 +84,7 @@ const AdminGestionPedidosPage = () => {
                     estado: item.estado === 'procesando' ? 'en-preparacion' : item.estado,
                     items: item.items,
                     // Guardamos datos completos del cliente para el detalle
-                    datosClienteCompleto: item.cliente
+                    datosClienteCompleto: clienteCompleto
                 };
             });
             // ---------------------------

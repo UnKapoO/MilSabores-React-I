@@ -1,21 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { useLocation, Navigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { OrderSuccessCard } from '../../components/ui/OrderSuccesCard';
 import { Button } from '../../components/ui/common/Button';
-import { useCart } from '../../context/CartContext';
 
 function ConfirmacionPage() {
     const location = useLocation();
     const orden = location.state?.orden;
-    const { clearCart } = useCart();
-    const hasClearedRef = useRef(false);
 
-    useEffect(() => {
-        if (orden && !hasClearedRef.current) {
-            clearCart(); 
-            hasClearedRef.current = true;
-        }
-    }, [orden, clearCart]);
 
     if (!orden) {
         return (
