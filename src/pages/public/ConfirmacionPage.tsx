@@ -6,16 +6,13 @@ import { useCart } from '../../context/CartContext';
 
 function ConfirmacionPage() {
     const location = useLocation();
-    // 1. Recuperamos la orden que nos envió el CheckoutPage
     const orden = location.state?.orden;
     const { clearCart } = useCart();
     const hasClearedRef = useRef(false);
-    // 2. Protección de Ruta:
-    // Si alguien intenta entrar directo a /confirmacion sin haber comprado,
-    // 'orden' será undefined. En ese caso, mostramos un error o redirigimos.
+
     useEffect(() => {
         if (orden && !hasClearedRef.current) {
-            clearCart(); // Limpiamos el carrito AQUÍ, una vez que la página ya cargó
+            clearCart(); 
             hasClearedRef.current = true;
         }
     }, [orden, clearCart]);

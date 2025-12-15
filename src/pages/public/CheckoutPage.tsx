@@ -38,7 +38,7 @@ const getLocalDateString = (date: Date) => {
 function CheckoutPage() {
     const navigate = useNavigate();
     const { user } = useAuth(); // <-- 2. SACAMOS EL USUARIO
-    const { cart, addToast } = useCart(); // (Sin clearCart aquí)
+    const { cart, addToast, clearCart } = useCart(); 
 
     // Cálculo de fechas
     const today = new Date();
@@ -126,13 +126,9 @@ function CheckoutPage() {
         const newOrder = {
             // Usamos el email del usuario logueado, o "guest"
             userId: user ? user.email : "guest",
-            
-            id: `ORD-${Date.now()}`,
-            
-            fechaCreacion: new Date().toISOString(),
             total: total,
-            estado: "pendiente",
             items: cart.map(item => ({
+                id: item.id,
                 nombre: item.nombre,
                 cantidad: item.cantidad,
                 precio: item.precio,
@@ -159,17 +155,18 @@ function CheckoutPage() {
             });
 
             if (!response.ok) {
-                throw new Error('Error al guardar el pedido');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al guardar el pedido');
             }
 
             const savedOrder = await response.json();
-
+            clearCart();
             // 5. NAVEGACIÓN EXITOSA
             navigate('/confirmacion', { state: { orden: savedOrder } });
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error al procesar el pedido:", error);
-            addToast("Hubo un problema al procesar tu pedido. Inténtalo nuevamente.", "error");
+            addToast(error.message || "Hubo un problema al procesar tu pedido. Inténtalo nuevamente.", "error");
         }
     };
 
